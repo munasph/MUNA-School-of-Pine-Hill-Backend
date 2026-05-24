@@ -1,0 +1,116 @@
+package com.bezkoder.spring.jpa.postgresql.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+/**
+ * Single-row site branding table (id is always 1).
+ * Mirrors {@code SCHOOL_INFO} in the Angular frontend.
+ */
+@Entity
+@Table(name = "site_settings")
+public class SiteSettings {
+
+	public static final long SINGLETON_ID = 1L;
+
+	@Id
+	private Long id = SINGLETON_ID;
+
+	@Column(nullable = false, length = 200)
+	private String name = "School Name";
+
+	@Column(name = "short_name", nullable = false, length = 100)
+	private String shortName = "School";
+
+	@Column(name = "founded_year", length = 10)
+	private String foundedYear = "0000";
+
+	@Column(length = 500)
+	private String address = "Street Address, City, State, Country";
+
+	@Column(length = 50)
+	private String phone = "Phone Number";
+
+	@Column(length = 200)
+	private String email = "email@example.com";
+
+	@Column(name = "office_hours", length = 200)
+	private String officeHours = "Office Hours Placeholder";
+
+	@Column(name = "base_url", length = 500)
+	private String baseUrl = "https://example.com";
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getShortName() {
+		return shortName;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
+	}
+
+	public String getFoundedYear() {
+		return foundedYear;
+	}
+
+	public void setFoundedYear(String foundedYear) {
+		this.foundedYear = foundedYear;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getOfficeHours() {
+		return officeHours;
+	}
+
+	public void setOfficeHours(String officeHours) {
+		this.officeHours = officeHours;
+	}
+
+	public String getBaseUrl() {
+		return baseUrl;
+	}
+
+	public void setBaseUrl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
+}
