@@ -1,4 +1,4 @@
-package com.bezkoder.spring.jpa.postgresql.model;
+package com.bezkoder.spring.jpa.postgresql.entity;
 
 import java.time.Instant;
 
@@ -11,6 +11,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
+/** JPA entity — maps to the {@code announcements} table. */
 @Entity
 @Table(name = "announcements")
 public class Announcement {

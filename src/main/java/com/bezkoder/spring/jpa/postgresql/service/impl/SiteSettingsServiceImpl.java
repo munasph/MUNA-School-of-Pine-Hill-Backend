@@ -5,8 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.spring.jpa.postgresql.dto.site.SiteSettingsRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.site.SiteSettingsResponse;
-import com.bezkoder.spring.jpa.postgresql.mapper.EntityMapper;
-import com.bezkoder.spring.jpa.postgresql.model.SiteSettings;
+import com.bezkoder.spring.jpa.postgresql.entity.SiteSettings;
 import com.bezkoder.spring.jpa.postgresql.repository.SiteSettingsRepository;
 import com.bezkoder.spring.jpa.postgresql.service.SiteSettingsService;
 
@@ -22,13 +21,23 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 
 	@Override
 	public SiteSettingsResponse getSettings() {
-		return EntityMapper.toSiteSettingsResponse(getOrCreateSettings());
+		return toResponse(getOrCreateSettings());
 	}
 
 	@Override
 	@Transactional
 	public SiteSettingsResponse updateSettings(SiteSettingsRequest request) {
 		SiteSettings entity = getOrCreateSettings();
+		applyRequest(entity, request);
+		return toResponse(siteSettingsRepository.save(entity));
+	}
+
+	private SiteSettings getOrCreateSettings() {
+		return siteSettingsRepository.findById(SiteSettings.SINGLETON_ID)
+				.orElseGet(() -> siteSettingsRepository.save(new SiteSettings()));
+	}
+
+	private void applyRequest(SiteSettings entity, SiteSettingsRequest request) {
 		entity.setName(request.getName());
 		entity.setShortName(request.getShortName());
 		entity.setFoundedYear(request.getFoundedYear());
@@ -37,11 +46,18 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		entity.setEmail(request.getEmail());
 		entity.setOfficeHours(request.getOfficeHours());
 		entity.setBaseUrl(request.getBaseUrl());
-		return EntityMapper.toSiteSettingsResponse(siteSettingsRepository.save(entity));
 	}
 
-	private SiteSettings getOrCreateSettings() {
-		return siteSettingsRepository.findById(SiteSettings.SINGLETON_ID)
-				.orElseGet(() -> siteSettingsRepository.save(new SiteSettings()));
+	private SiteSettingsResponse toResponse(SiteSettings entity) {
+		SiteSettingsResponse response = new SiteSettingsResponse();
+		response.setName(entity.getName());
+		response.setShortName(entity.getShortName());
+		response.setFoundedYear(entity.getFoundedYear());
+		response.setAddress(entity.getAddress());
+		response.setPhone(entity.getPhone());
+		response.setEmail(entity.getEmail());
+		response.setOfficeHours(entity.getOfficeHours());
+		response.setBaseUrl(entity.getBaseUrl());
+		return response;
 	}
 }

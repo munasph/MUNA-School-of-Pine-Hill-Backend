@@ -7,9 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.spring.jpa.postgresql.dto.announcement.AnnouncementRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.announcement.AnnouncementResponse;
+import com.bezkoder.spring.jpa.postgresql.entity.Announcement;
 import com.bezkoder.spring.jpa.postgresql.exception.ResourceNotFoundException;
-import com.bezkoder.spring.jpa.postgresql.mapper.EntityMapper;
-import com.bezkoder.spring.jpa.postgresql.model.Announcement;
 import com.bezkoder.spring.jpa.postgresql.repository.AnnouncementRepository;
 import com.bezkoder.spring.jpa.postgresql.service.AnnouncementService;
 
@@ -26,38 +25,33 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 	@Override
 	public List<AnnouncementResponse> getAllAnnouncements() {
 		return announcementRepository.findAllByOrderByUpdatedAtDesc().stream()
-				.map(EntityMapper::toAnnouncementResponse)
+				.map(this::toResponse)
 				.toList();
 	}
 
 	@Override
 	public List<AnnouncementResponse> getActiveAnnouncements() {
 		return announcementRepository.findByActiveTrueOrderByUpdatedAtDesc().stream()
-				.map(EntityMapper::toAnnouncementResponse)
+				.map(this::toResponse)
 				.toList();
 	}
 
 	@Override
 	public AnnouncementResponse getAnnouncementById(Long id) {
-		Announcement entity = announcementRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Announcement not found with id: " + id));
-		return EntityMapper.toAnnouncementResponse(entity);
+		return toResponse(findAnnouncementOrThrow(id));
 	}
 
 	@Override
 	@Transactional
 	public AnnouncementResponse createAnnouncement(AnnouncementRequest request) {
-		Announcement entity = mapRequestToEntity(new Announcement(), request);
-		return EntityMapper.toAnnouncementResponse(announcementRepository.save(entity));
+		return toResponse(announcementRepository.save(toEntity(new Announcement(), request)));
 	}
 
 	@Override
 	@Transactional
 	public AnnouncementResponse updateAnnouncement(Long id, AnnouncementRequest request) {
-		Announcement entity = announcementRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Announcement not found with id: " + id));
-		mapRequestToEntity(entity, request);
-		return EntityMapper.toAnnouncementResponse(announcementRepository.save(entity));
+		Announcement entity = findAnnouncementOrThrow(id);
+		return toResponse(announcementRepository.save(toEntity(entity, request)));
 	}
 
 	@Override
@@ -69,7 +63,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 		announcementRepository.deleteById(id);
 	}
 
-	private Announcement mapRequestToEntity(Announcement entity, AnnouncementRequest request) {
+	private Announcement findAnnouncementOrThrow(Long id) {
+		return announcementRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Announcement not found with id: " + id));
+	}
+
+	private Announcement toEntity(Announcement entity, AnnouncementRequest request) {
 		entity.setEmoji(request.getEmoji());
 		entity.setTitle(request.getTitle());
 		entity.setSubtitle(request.getSubtitle());
@@ -77,5 +76,19 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 		entity.setHref(request.getHref());
 		entity.setActive(request.isActive());
 		return entity;
+	}
+
+	private AnnouncementResponse toResponse(Announcement entity) {
+		AnnouncementResponse response = new AnnouncementResponse();
+		response.setId(entity.getId());
+		response.setEmoji(entity.getEmoji());
+		response.setTitle(entity.getTitle());
+		response.setSubtitle(entity.getSubtitle());
+		response.setCta(entity.getCta());
+		response.setHref(entity.getHref());
+		response.setActive(entity.isActive());
+		response.setCreatedAt(entity.getCreatedAt());
+		response.setUpdatedAt(entity.getUpdatedAt());
+		return response;
 	}
 }

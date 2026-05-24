@@ -1,6 +1,6 @@
 package com.bezkoder.spring.jpa.postgresql.dto.admission;
 
-import com.bezkoder.spring.jpa.postgresql.model.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 
 import jakarta.validation.constraints.NotNull;
 

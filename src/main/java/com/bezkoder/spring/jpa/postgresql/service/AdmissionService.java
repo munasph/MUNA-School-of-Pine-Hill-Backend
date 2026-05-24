@@ -6,7 +6,7 @@ import com.bezkoder.spring.jpa.postgresql.dto.admission.AdmissionResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.AdmissionSubmitResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.CreateAdmissionRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.UpdateAdmissionStatusRequest;
-import com.bezkoder.spring.jpa.postgresql.model.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 
 public interface AdmissionService {
 

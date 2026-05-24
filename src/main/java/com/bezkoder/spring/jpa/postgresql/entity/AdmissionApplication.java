@@ -1,7 +1,9 @@
-package com.bezkoder.spring.jpa.postgresql.model;
+package com.bezkoder.spring.jpa.postgresql.entity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+/** JPA entity — maps to the {@code admission_applications} table. */
 @Entity
 @Table(name = "admission_applications")
 public class AdmissionApplication {

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.spring.jpa.postgresql.dto.admin.AdminDashboardResponse;
-import com.bezkoder.spring.jpa.postgresql.model.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 import com.bezkoder.spring.jpa.postgresql.repository.AdmissionApplicationRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.AnnouncementRepository;
 import com.bezkoder.spring.jpa.postgresql.service.AdminDashboardService;

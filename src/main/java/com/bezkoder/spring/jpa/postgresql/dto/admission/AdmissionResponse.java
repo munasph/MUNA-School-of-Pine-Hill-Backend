@@ -3,7 +3,7 @@ package com.bezkoder.spring.jpa.postgresql.dto.admission;
 import java.time.Instant;
 import java.time.LocalDate;
 
-import com.bezkoder.spring.jpa.postgresql.model.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 
 public class AdmissionResponse {
 

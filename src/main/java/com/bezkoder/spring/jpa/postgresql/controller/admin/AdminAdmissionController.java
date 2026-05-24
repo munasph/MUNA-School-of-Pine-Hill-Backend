@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bezkoder.spring.jpa.postgresql.dto.admission.AdmissionResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.UpdateAdmissionStatusRequest;
-import com.bezkoder.spring.jpa.postgresql.model.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
 import com.bezkoder.spring.jpa.postgresql.service.AdmissionService;
 
 import jakarta.validation.Valid;

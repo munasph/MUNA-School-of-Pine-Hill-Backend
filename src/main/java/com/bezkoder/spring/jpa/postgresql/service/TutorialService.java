@@ -3,7 +3,7 @@ package com.bezkoder.spring.jpa.postgresql.service;
 import java.util.List;
 import java.util.Optional;
 
-import com.bezkoder.spring.jpa.postgresql.model.Tutorial;
+import com.bezkoder.spring.jpa.postgresql.entity.Tutorial;
 
 public interface TutorialService {
 

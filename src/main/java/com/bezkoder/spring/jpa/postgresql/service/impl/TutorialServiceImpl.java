@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.spring.jpa.postgresql.exception.ResourceNotFoundException;
-import com.bezkoder.spring.jpa.postgresql.model.Tutorial;
+import com.bezkoder.spring.jpa.postgresql.entity.Tutorial;
 import com.bezkoder.spring.jpa.postgresql.repository.TutorialRepository;
 import com.bezkoder.spring.jpa.postgresql.service.TutorialService;
 

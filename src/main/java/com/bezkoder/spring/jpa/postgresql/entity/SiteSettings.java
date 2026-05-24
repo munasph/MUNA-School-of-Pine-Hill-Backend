@@ -1,14 +1,11 @@
-package com.bezkoder.spring.jpa.postgresql.model;
+package com.bezkoder.spring.jpa.postgresql.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/**
- * Single-row site branding table (id is always 1).
- * Mirrors {@code SCHOOL_INFO} in the Angular frontend.
- */
+/** JPA entity — single-row {@code site_settings} table (id is always 1). */
 @Entity
 @Table(name = "site_settings")
 public class SiteSettings {
