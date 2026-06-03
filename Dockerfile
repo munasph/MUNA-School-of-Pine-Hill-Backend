@@ -1,5 +1,5 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+# openjdk:17-jdk-slim was removed from Docker Hub — Temurin is the official replacement
+FROM eclipse-temurin:17-jdk-jammy
 
 # Set the working directory in the container
 WORKDIR /app
