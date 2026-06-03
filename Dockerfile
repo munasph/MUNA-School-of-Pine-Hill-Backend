@@ -1,23 +1,20 @@
-# ---- Build ----
-FROM eclipse-temurin:17-jdk-alpine AS build
+# Use an official OpenJDK runtime as a parent image
+FROM openjdk:17-jdk-slim
+
+# Set the working directory in the container
 WORKDIR /app
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-RUN chmod +x mvnw
+# Copy the project files to the container
+COPY . .
 
-COPY src src
-RUN ./mvnw clean package -DskipTests -B
+# Grant execute permissions for the mvnw script
+RUN chmod +x ./mvnw
 
-# ---- Run ----
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
+# Build the application
+RUN ./mvnw clean install -DskipTests
 
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-
-COPY --from=build /app/target/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar app.jar
-
+# Expose the port the app runs on
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Run the application
+CMD ["java", "-jar", "target/spring-boot-jpa-postgresql-0.0.1-SNAPSHOT.jar"]

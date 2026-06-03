@@ -52,7 +52,6 @@ public class SecurityConfig {
 								"/api/seo/**",
 								"/api/admission/form-fields")
 								.permitAll()
-						.requestMatchers("/api/tutorials/**").permitAll()
 						.requestMatchers("/api/admin/**").hasRole("ADMIN")
 						.anyRequest().permitAll())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

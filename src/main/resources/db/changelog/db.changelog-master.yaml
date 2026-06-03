@@ -1,19 +1,73 @@
+# One SQL file per table, numbered 001–022.
+# If your Neon DB already ran the old migrations, reset the branch (or drop all tables
+# and truncate databasechangelog) before deploying this changelog.
 databaseChangeLog:
   - include:
-      file: changes/001-create-tables.sql
+      file: changes/001-create-admission-applications.sql
       relativeToChangelogFile: true
   - include:
-      file: changes/002-seed-default-data.sql
+      file: changes/002-create-announcements.sql
       relativeToChangelogFile: true
   - include:
-      file: changes/003-create-contact-messages.sql
+      file: changes/003-create-site-settings.sql
       relativeToChangelogFile: true
   - include:
-      file: changes/004-ensure-missing-tables.sql
+      file: changes/004-create-contact-messages.sql
       relativeToChangelogFile: true
   - include:
-      file: changes/005-admin-enhancements.sql
+      file: changes/005-create-events.sql
       relativeToChangelogFile: true
   - include:
-      file: changes/006-cms-feature-scaffold.sql
+      file: changes/006-create-news-posts.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/007-create-faculty-members.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/008-create-documents.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/009-create-gallery-items.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/010-create-faq-items.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/011-create-media-assets.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/012-create-page-seo.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/013-create-admin-users.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/014-create-grade-intake-limits.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/015-create-admission-form-fields.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/016-create-inquiry-reply-templates.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/017-create-email-campaigns.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/018-create-audit-logs.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/019-create-notification-settings.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/020-create-analytics-settings.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/021-create-admission-notes.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/022-create-admission-documents.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/023-drop-tutorials-table.sql
       relativeToChangelogFile: true
