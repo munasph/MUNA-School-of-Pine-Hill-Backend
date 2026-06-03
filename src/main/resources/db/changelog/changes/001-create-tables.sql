@@ -1,8 +1,6 @@
 --liquibase formatted sql
 
 --changeset cms:001-admission-applications
---preconditions onFail:MARK_RAN
---precondition-not tableExists tableName=admission_applications
 CREATE TABLE admission_applications (
     id              BIGSERIAL PRIMARY KEY,
     application_id  VARCHAR(64)  NOT NULL,
@@ -24,8 +22,6 @@ CREATE INDEX idx_admission_applications_status
     ON admission_applications (status);
 
 --changeset cms:001-announcements
---preconditions onFail:MARK_RAN
---precondition-not tableExists tableName=announcements
 CREATE TABLE announcements (
     id          BIGSERIAL PRIMARY KEY,
     emoji       VARCHAR(16),
@@ -42,8 +38,6 @@ CREATE INDEX idx_announcements_active_updated_at
     ON announcements (active, updated_at DESC);
 
 --changeset cms:001-site-settings
---preconditions onFail:MARK_RAN
---precondition-not tableExists tableName=site_settings
 CREATE TABLE site_settings (
     id            BIGINT PRIMARY KEY,
     name          VARCHAR(200) NOT NULL DEFAULT 'School Name',
@@ -57,9 +51,7 @@ CREATE TABLE site_settings (
 );
 
 --changeset cms:001-tutorials
---preconditions onFail:MARK_RAN
---precondition-not tableExists tableName=tutorials
-CREATE TABLE tutorials (
+CREATE TABLE IF NOT EXISTS tutorials (
     id          BIGSERIAL PRIMARY KEY,
     title       VARCHAR(255),
     description TEXT,

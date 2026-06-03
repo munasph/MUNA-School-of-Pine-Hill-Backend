@@ -10,6 +10,7 @@ public class SiteSettingsResponse {
 	private String email;
 	private String officeHours;
 	private String baseUrl;
+	private boolean admissionsOpen;
 
 	public String getName() {
 		return name;
@@ -73,5 +74,13 @@ public class SiteSettingsResponse {
 
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+	public boolean isAdmissionsOpen() {
+		return admissionsOpen;
+	}
+
+	public void setAdmissionsOpen(boolean admissionsOpen) {
+		this.admissionsOpen = admissionsOpen;
 	}
 }

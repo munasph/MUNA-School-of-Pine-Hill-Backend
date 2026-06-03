@@ -34,6 +34,8 @@ public class SiteSettingsRequest {
 	@Size(max = 500)
 	private String baseUrl;
 
+	private boolean admissionsOpen = true;
+
 	public String getName() {
 		return name;
 	}
@@ -96,5 +98,13 @@ public class SiteSettingsRequest {
 
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+	public boolean isAdmissionsOpen() {
+		return admissionsOpen;
+	}
+
+	public void setAdmissionsOpen(boolean admissionsOpen) {
+		this.admissionsOpen = admissionsOpen;
 	}
 }

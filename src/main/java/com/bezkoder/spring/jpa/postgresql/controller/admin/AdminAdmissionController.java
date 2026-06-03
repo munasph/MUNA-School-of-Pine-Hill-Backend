@@ -39,6 +39,15 @@ public class AdminAdmissionController {
 		return ResponseEntity.ok(applications);
 	}
 
+	@GetMapping(value = "/export", produces = "text/csv")
+	public ResponseEntity<String> exportApplications(
+			@RequestParam(required = false) ApplicationStatus status) {
+		String csv = admissionService.exportApplicationsAsCsv(status);
+		return ResponseEntity.ok()
+				.header("Content-Disposition", "attachment; filename=\"admission-applications.csv\"")
+				.body(csv);
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<AdmissionResponse> getApplicationById(@PathVariable Long id) {
 		return ResponseEntity.ok(admissionService.getApplicationById(id));

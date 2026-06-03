@@ -2,6 +2,8 @@ package com.bezkoder.spring.jpa.postgresql.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -38,6 +40,9 @@ public class SiteSettings {
 
 	@Column(name = "base_url", length = 500)
 	private String baseUrl = "https://example.com";
+
+	@Column(name = "admissions_open", nullable = false)
+	private boolean admissionsOpen = true;
 
 	public Long getId() {
 		return id;
@@ -109,5 +114,13 @@ public class SiteSettings {
 
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+	public boolean isAdmissionsOpen() {
+		return admissionsOpen;
+	}
+
+	public void setAdmissionsOpen(boolean admissionsOpen) {
+		this.admissionsOpen = admissionsOpen;
 	}
 }

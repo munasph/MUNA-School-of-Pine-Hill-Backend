@@ -12,8 +12,11 @@ import com.bezkoder.spring.jpa.postgresql.dto.admission.CreateAdmissionRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.UpdateAdmissionStatusRequest;
 import com.bezkoder.spring.jpa.postgresql.entity.AdmissionApplication;
 import com.bezkoder.spring.jpa.postgresql.entity.enums.ApplicationStatus;
+import com.bezkoder.spring.jpa.postgresql.exception.BadRequestException;
 import com.bezkoder.spring.jpa.postgresql.exception.ResourceNotFoundException;
 import com.bezkoder.spring.jpa.postgresql.repository.AdmissionApplicationRepository;
+import com.bezkoder.spring.jpa.postgresql.repository.SiteSettingsRepository;
+import com.bezkoder.spring.jpa.postgresql.entity.SiteSettings;
 import com.bezkoder.spring.jpa.postgresql.service.AdmissionService;
 
 @Service
@@ -21,14 +24,24 @@ import com.bezkoder.spring.jpa.postgresql.service.AdmissionService;
 public class AdmissionServiceImpl implements AdmissionService {
 
 	private final AdmissionApplicationRepository admissionRepository;
+	private final SiteSettingsRepository siteSettingsRepository;
 
-	public AdmissionServiceImpl(AdmissionApplicationRepository admissionRepository) {
+	public AdmissionServiceImpl(
+			AdmissionApplicationRepository admissionRepository,
+			SiteSettingsRepository siteSettingsRepository) {
 		this.admissionRepository = admissionRepository;
+		this.siteSettingsRepository = siteSettingsRepository;
 	}
 
 	@Override
 	@Transactional
 	public AdmissionSubmitResponse submitApplication(CreateAdmissionRequest request) {
+		SiteSettings settings = siteSettingsRepository.findById(SiteSettings.SINGLETON_ID)
+				.orElse(new SiteSettings());
+		if (!settings.isAdmissionsOpen()) {
+			throw new BadRequestException("Admission applications are currently closed.");
+		}
+
 		AdmissionApplication saved = admissionRepository.save(toEntity(request));
 
 		return new AdmissionSubmitResponse(
@@ -72,6 +85,38 @@ public class AdmissionServiceImpl implements AdmissionService {
 			throw new ResourceNotFoundException("Application not found with id: " + id);
 		}
 		admissionRepository.deleteById(id);
+	}
+
+	@Override
+	public String exportApplicationsAsCsv(ApplicationStatus status) {
+		List<AdmissionResponse> applications = status == null
+				? getAllApplications()
+				: getApplicationsByStatus(status);
+
+		StringBuilder csv = new StringBuilder();
+		csv.append("Application ID,Full Name,Date of Birth,Class,Gender,Parent Name,Parent Phone,Status,Submitted At\n");
+
+		for (AdmissionResponse app : applications) {
+			csv.append(csvCell(app.getApplicationId())).append(',')
+					.append(csvCell(app.getFullName())).append(',')
+					.append(csvCell(app.getDob() != null ? app.getDob().toString() : "")).append(',')
+					.append(csvCell(app.getClassApplying())).append(',')
+					.append(csvCell(app.getGender())).append(',')
+					.append(csvCell(app.getParentName())).append(',')
+					.append(csvCell(app.getParentPhone())).append(',')
+					.append(csvCell(app.getStatus() != null ? app.getStatus().name() : "")).append(',')
+					.append(csvCell(app.getSubmittedAt() != null ? app.getSubmittedAt().toString() : ""))
+					.append('\n');
+		}
+
+		return csv.toString();
+	}
+
+	private static String csvCell(String value) {
+		if (value == null) {
+			return "\"\"";
+		}
+		return "\"" + value.replace("\"", "\"\"") + "\"";
 	}
 
 	private AdmissionApplication findApplicationOrThrow(Long id) {

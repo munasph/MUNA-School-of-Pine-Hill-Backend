@@ -21,4 +21,6 @@ public interface AdmissionService {
 	AdmissionResponse updateApplicationStatus(Long id, UpdateAdmissionStatusRequest request);
 
 	void deleteApplication(Long id);
+
+	String exportApplicationsAsCsv(ApplicationStatus status);
 }

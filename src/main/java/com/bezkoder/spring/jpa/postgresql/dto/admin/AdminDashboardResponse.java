@@ -5,6 +5,7 @@ public class AdminDashboardResponse {
 	private long totalApplications;
 	private long pendingApplications;
 	private long activeAnnouncements;
+	private long newContactMessages;
 
 	public long getTotalApplications() {
 		return totalApplications;
@@ -28,5 +29,13 @@ public class AdminDashboardResponse {
 
 	public void setActiveAnnouncements(long activeAnnouncements) {
 		this.activeAnnouncements = activeAnnouncements;
+	}
+
+	public long getNewContactMessages() {
+		return newContactMessages;
+	}
+
+	public void setNewContactMessages(long newContactMessages) {
+		this.newContactMessages = newContactMessages;
 	}
 }
