@@ -19,4 +19,10 @@ public interface PortalAuthService {
 	PortalAuthResponse forgotPassword(ForgotPasswordRequest request, String clientIp);
 
 	PortalAuthResponse resetPassword(ResetPasswordRequest request);
+
+	/** Emails a one-time passwordless login link (always returns a generic message). */
+	PortalAuthResponse requestMagicLink(String email, String clientIp);
+
+	/** Exchanges a magic-link token for a session (also verifies the email). */
+	PortalAuthResponse consumeMagicLink(String rawToken);
 }

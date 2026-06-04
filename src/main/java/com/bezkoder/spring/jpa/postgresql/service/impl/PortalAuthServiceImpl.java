@@ -16,11 +16,13 @@ import com.bezkoder.spring.jpa.postgresql.dto.portal.PortalLoginRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.PortalSignupRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.ResetPasswordRequest;
 import com.bezkoder.spring.jpa.postgresql.entity.EmailVerificationToken;
+import com.bezkoder.spring.jpa.postgresql.entity.MagicLinkToken;
 import com.bezkoder.spring.jpa.postgresql.entity.PasswordResetToken;
 import com.bezkoder.spring.jpa.postgresql.entity.PortalUser;
 import com.bezkoder.spring.jpa.postgresql.exception.BadRequestException;
 import com.bezkoder.spring.jpa.postgresql.exception.UnauthorizedException;
 import com.bezkoder.spring.jpa.postgresql.repository.EmailVerificationTokenRepository;
+import com.bezkoder.spring.jpa.postgresql.repository.MagicLinkTokenRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.PasswordResetTokenRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.PortalUserRepository;
 import com.bezkoder.spring.jpa.postgresql.security.JwtService;
@@ -41,6 +43,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 	private final PortalUserRepository portalUserRepository;
 	private final EmailVerificationTokenRepository verificationTokenRepository;
 	private final PasswordResetTokenRepository resetTokenRepository;
+	private final MagicLinkTokenRepository magicLinkTokenRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final TotpService totpService;
@@ -53,11 +56,14 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 	private final int lockoutMinutes;
 	private final int emailTokenTtlMinutes;
 	private final int resetTokenTtlMinutes;
+	private final int magicLinkTtlMinutes;
+	private final boolean magicLinkEnabled;
 
 	public PortalAuthServiceImpl(
 			PortalUserRepository portalUserRepository,
 			EmailVerificationTokenRepository verificationTokenRepository,
 			PasswordResetTokenRepository resetTokenRepository,
+			MagicLinkTokenRepository magicLinkTokenRepository,
 			PasswordEncoder passwordEncoder,
 			JwtService jwtService,
 			TotpService totpService,
@@ -68,10 +74,13 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 			@Value("${app.security.max-failed-logins:5}") int maxFailedLogins,
 			@Value("${app.security.lockout-minutes:15}") int lockoutMinutes,
 			@Value("${app.security.email-token-ttl-minutes:1440}") int emailTokenTtlMinutes,
-			@Value("${app.security.reset-token-ttl-minutes:60}") int resetTokenTtlMinutes) {
+			@Value("${app.security.reset-token-ttl-minutes:60}") int resetTokenTtlMinutes,
+			@Value("${app.security.magic-link-ttl-minutes:15}") int magicLinkTtlMinutes,
+			@Value("${app.auth.magic-link-enabled:true}") boolean magicLinkEnabled) {
 		this.portalUserRepository = portalUserRepository;
 		this.verificationTokenRepository = verificationTokenRepository;
 		this.resetTokenRepository = resetTokenRepository;
+		this.magicLinkTokenRepository = magicLinkTokenRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtService = jwtService;
 		this.totpService = totpService;
@@ -83,6 +92,8 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 		this.lockoutMinutes = lockoutMinutes;
 		this.emailTokenTtlMinutes = emailTokenTtlMinutes;
 		this.resetTokenTtlMinutes = resetTokenTtlMinutes;
+		this.magicLinkTtlMinutes = magicLinkTtlMinutes;
+		this.magicLinkEnabled = magicLinkEnabled;
 	}
 
 	@Override
@@ -252,6 +263,69 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 		auditService.record("PORTAL_RESET_DONE", user.getEmail(), "Password reset completed");
 
 		return new PortalAuthResponse(true, "Password updated. You can now log in.");
+	}
+
+	@Override
+	@Transactional
+	public PortalAuthResponse requestMagicLink(String email, String clientIp) {
+		if (!magicLinkEnabled) {
+			throw new BadRequestException("Magic-link login is not available.");
+		}
+		rateLimiter.checkAndIncrement("magic:" + clientIp);
+		String normalized = email.trim().toLowerCase();
+
+		portalUserRepository.findByEmailIgnoreCase(normalized).ifPresent(user -> {
+			if (!user.isActive()) {
+				return;
+			}
+			magicLinkTokenRepository.deleteByUserId(user.getId());
+
+			String raw = SecureTokens.randomToken();
+			MagicLinkToken token = new MagicLinkToken();
+			token.setUserId(user.getId());
+			token.setTokenHash(SecureTokens.hash(raw));
+			token.setExpiresAt(Instant.now().plus(magicLinkTtlMinutes, ChronoUnit.MINUTES));
+			magicLinkTokenRepository.save(token);
+
+			String link = frontendBaseUrl + "/portal/magic-link?token=" + raw;
+			emailService.sendMagicLinkEmail(user.getEmail(), user.getFullName(), link);
+			auditService.record("PORTAL_MAGIC_REQUEST", normalized, "Magic link requested");
+		});
+
+		return new PortalAuthResponse(true,
+				"If an account exists for that email, a login link has been sent.");
+	}
+
+	@Override
+	@Transactional
+	public PortalAuthResponse consumeMagicLink(String rawToken) {
+		MagicLinkToken token = magicLinkTokenRepository.findByTokenHash(SecureTokens.hash(rawToken))
+				.orElseThrow(() -> new BadRequestException("Invalid or expired login link."));
+
+		if (!token.isUsable()) {
+			throw new BadRequestException("This login link has expired. Request a new one.");
+		}
+
+		PortalUser user = portalUserRepository.findById(token.getUserId())
+				.orElseThrow(() -> new BadRequestException("Account no longer exists."));
+
+		if (!user.isActive()) {
+			throw new UnauthorizedException("This account has been disabled.");
+		}
+
+		token.setUsedAt(Instant.now());
+		magicLinkTokenRepository.save(token);
+
+		// Following a magic link proves email ownership, so verify the address too.
+		if (!user.isEmailVerified()) {
+			user.setEmailVerified(true);
+		}
+		clearLockout(user);
+		user.setLastLoginAt(Instant.now());
+		portalUserRepository.save(user);
+		auditService.record("PORTAL_MAGIC_LOGIN", user.getEmail(), "Magic link login");
+
+		return buildAuthSuccess(user);
 	}
 
 	private void issueVerificationEmail(PortalUser user) {

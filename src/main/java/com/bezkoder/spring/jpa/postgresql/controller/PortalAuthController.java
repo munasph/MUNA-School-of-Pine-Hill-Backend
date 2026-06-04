@@ -1,11 +1,15 @@
 package com.bezkoder.spring.jpa.postgresql.controller;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bezkoder.spring.jpa.postgresql.dto.portal.AuthMethodsResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.ForgotPasswordRequest;
+import com.bezkoder.spring.jpa.postgresql.dto.portal.MagicLinkRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.PortalAuthResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.PortalLoginRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.portal.PortalSignupRequest;
@@ -22,8 +26,34 @@ public class PortalAuthController {
 
 	private final PortalAuthService portalAuthService;
 
-	public PortalAuthController(PortalAuthService portalAuthService) {
+	private final boolean passwordEnabled;
+	private final boolean magicLinkEnabled;
+	private final boolean googleEnabled;
+	private final String googleClientId;
+
+	public PortalAuthController(
+			PortalAuthService portalAuthService,
+			@Value("${app.auth.password-enabled:true}") boolean passwordEnabled,
+			@Value("${app.auth.magic-link-enabled:true}") boolean magicLinkEnabled,
+			@Value("${app.auth.google-enabled:false}") boolean googleEnabled,
+			@Value("${app.auth.google-client-id:}") String googleClientId) {
 		this.portalAuthService = portalAuthService;
+		this.passwordEnabled = passwordEnabled;
+		this.magicLinkEnabled = magicLinkEnabled;
+		this.googleEnabled = googleEnabled;
+		this.googleClientId = googleClientId;
+	}
+
+	@GetMapping("/methods")
+	public AuthMethodsResponse methods() {
+		AuthMethodsResponse response = new AuthMethodsResponse();
+		response.setPassword(passwordEnabled);
+		response.setMagicLink(magicLinkEnabled);
+		response.setGoogle(googleEnabled);
+		if (googleEnabled) {
+			response.setGoogleClientId(googleClientId);
+		}
+		return response;
 	}
 
 	@PostMapping("/signup")
@@ -54,6 +84,16 @@ public class PortalAuthController {
 	@PostMapping("/reset-password")
 	public PortalAuthResponse resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
 		return portalAuthService.resetPassword(request);
+	}
+
+	@PostMapping("/magic-link/request")
+	public PortalAuthResponse requestMagicLink(@Valid @RequestBody MagicLinkRequest request, HttpServletRequest http) {
+		return portalAuthService.requestMagicLink(request.getEmail(), clientIp(http));
+	}
+
+	@PostMapping("/magic-link/consume")
+	public PortalAuthResponse consumeMagicLink(@Valid @RequestBody TokenRequest request) {
+		return portalAuthService.consumeMagicLink(request.getToken());
 	}
 
 	private String clientIp(HttpServletRequest request) {

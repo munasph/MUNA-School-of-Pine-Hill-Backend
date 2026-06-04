@@ -51,6 +51,15 @@ public class EmailServiceImpl implements EmailService {
 		send(to, "Reset your password", body, resetLink);
 	}
 
+	@Override
+	public void sendMagicLinkEmail(String to, String fullName, String loginLink) {
+		String body = "Hi " + fullName + ",\n\n"
+				+ "Here is your secure login link for the MUNA School family portal:\n\n"
+				+ loginLink + "\n\n"
+				+ "This link expires shortly and can only be used once. If you did not request it, you can ignore this email.";
+		send(to, "Your login link", body, loginLink);
+	}
+
 	private void send(String to, String subject, String body, String link) {
 		JavaMailSender sender = mailSenderProvider.getIfAvailable();
 		if (!mailEnabled || sender == null) {
