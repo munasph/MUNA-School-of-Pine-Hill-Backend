@@ -14,6 +14,9 @@ public class LoginRequest {
 	@Size(min = 8, max = 100)
 	private String password;
 
+	/** Optional TOTP code, required only when the admin account has MFA enabled. */
+	private String mfaCode;
+
 	public String getEmail() {
 		return email;
 	}
@@ -28,5 +31,13 @@ public class LoginRequest {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getMfaCode() {
+		return mfaCode;
+	}
+
+	public void setMfaCode(String mfaCode) {
+		this.mfaCode = mfaCode;
 	}
 }

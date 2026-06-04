@@ -11,6 +11,7 @@ import com.bezkoder.spring.jpa.postgresql.dto.auth.LoginRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.SignupRequest;
 import com.bezkoder.spring.jpa.postgresql.service.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 /** Auth endpoints — matches Angular {@code /api/auth/*}. */
@@ -25,12 +26,20 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-		return ResponseEntity.ok(authService.login(request));
+	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
+		return ResponseEntity.ok(authService.login(request, clientIp(http)));
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
 		return ResponseEntity.ok(authService.signup(request));
+	}
+
+	private String clientIp(HttpServletRequest request) {
+		String forwarded = request.getHeader("X-Forwarded-For");
+		if (forwarded != null && !forwarded.isBlank()) {
+			return forwarded.split(",")[0].trim();
+		}
+		return request.getRemoteAddr();
 	}
 }

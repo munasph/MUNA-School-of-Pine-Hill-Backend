@@ -71,3 +71,18 @@ databaseChangeLog:
   - include:
       file: changes/023-drop-tutorials-table.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/024-create-portal-users.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/025-create-email-verification-tokens.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/026-create-password-reset-tokens.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/027-create-parent-student-links.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/028-add-admin-mfa-columns.sql
+      relativeToChangelogFile: true

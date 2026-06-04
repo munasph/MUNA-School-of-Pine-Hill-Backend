@@ -2,7 +2,7 @@ package com.bezkoder.spring.jpa.postgresql.entity;
 
 import java.time.Instant;
 
-import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminUserRole;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.PortalUserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,8 +16,8 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "admin_users")
-public class AdminUser {
+@Table(name = "portal_users")
+public class PortalUser {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,27 +29,30 @@ public class AdminUser {
 	@Column(name = "password_hash", nullable = false, length = 255)
 	private String passwordHash;
 
-	@Column(name = "display_name", length = 200)
-	private String displayName;
+	@Column(name = "full_name", nullable = false, length = 200)
+	private String fullName;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
-	private AdminUserRole role = AdminUserRole.EDITOR;
+	private PortalUserRole role = PortalUserRole.PARENT;
+
+	@Column(name = "email_verified", nullable = false)
+	private boolean emailVerified = false;
 
 	@Column(nullable = false)
 	private boolean active = true;
-
-	@Column(name = "mfa_enabled", nullable = false)
-	private boolean mfaEnabled = false;
-
-	@Column(name = "mfa_secret", length = 64)
-	private String mfaSecret;
 
 	@Column(name = "failed_login_attempts", nullable = false)
 	private int failedLoginAttempts = 0;
 
 	@Column(name = "lockout_until")
 	private Instant lockoutUntil;
+
+	@Column(name = "mfa_enabled", nullable = false)
+	private boolean mfaEnabled = false;
+
+	@Column(name = "mfa_secret", length = 64)
+	private String mfaSecret;
 
 	@Column(name = "last_login_at")
 	private Instant lastLoginAt;
@@ -78,20 +81,22 @@ public class AdminUser {
 	public void setEmail(String email) { this.email = email; }
 	public String getPasswordHash() { return passwordHash; }
 	public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-	public String getDisplayName() { return displayName; }
-	public void setDisplayName(String displayName) { this.displayName = displayName; }
-	public AdminUserRole getRole() { return role; }
-	public void setRole(AdminUserRole role) { this.role = role; }
+	public String getFullName() { return fullName; }
+	public void setFullName(String fullName) { this.fullName = fullName; }
+	public PortalUserRole getRole() { return role; }
+	public void setRole(PortalUserRole role) { this.role = role; }
+	public boolean isEmailVerified() { return emailVerified; }
+	public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
 	public boolean isActive() { return active; }
 	public void setActive(boolean active) { this.active = active; }
-	public boolean isMfaEnabled() { return mfaEnabled; }
-	public void setMfaEnabled(boolean mfaEnabled) { this.mfaEnabled = mfaEnabled; }
-	public String getMfaSecret() { return mfaSecret; }
-	public void setMfaSecret(String mfaSecret) { this.mfaSecret = mfaSecret; }
 	public int getFailedLoginAttempts() { return failedLoginAttempts; }
 	public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
 	public Instant getLockoutUntil() { return lockoutUntil; }
 	public void setLockoutUntil(Instant lockoutUntil) { this.lockoutUntil = lockoutUntil; }
+	public boolean isMfaEnabled() { return mfaEnabled; }
+	public void setMfaEnabled(boolean mfaEnabled) { this.mfaEnabled = mfaEnabled; }
+	public String getMfaSecret() { return mfaSecret; }
+	public void setMfaSecret(String mfaSecret) { this.mfaSecret = mfaSecret; }
 	public Instant getLastLoginAt() { return lastLoginAt; }
 	public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
 	public Instant getCreatedAt() { return createdAt; }

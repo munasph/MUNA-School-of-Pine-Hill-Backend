@@ -6,7 +6,7 @@ import com.bezkoder.spring.jpa.postgresql.dto.auth.SignupRequest;
 
 public interface AuthService {
 
-	AuthResponse login(LoginRequest request);
+	AuthResponse login(LoginRequest request, String clientIp);
 
 	AuthResponse signup(SignupRequest request);
 }

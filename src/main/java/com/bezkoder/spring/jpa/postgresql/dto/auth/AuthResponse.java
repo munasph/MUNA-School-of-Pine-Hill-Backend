@@ -10,6 +10,8 @@ public class AuthResponse {
 	private String token;
 	private String email;
 	private List<String> roles;
+	/** True when credentials were valid but a TOTP code is still required. */
+	private boolean mfaRequired;
 
 	public AuthResponse() {
 	}
@@ -17,6 +19,20 @@ public class AuthResponse {
 	public AuthResponse(boolean success, String message) {
 		this.success = success;
 		this.message = message;
+	}
+
+	public static AuthResponse mfaChallenge() {
+		AuthResponse response = new AuthResponse(false, "Enter your authentication code to continue.");
+		response.setMfaRequired(true);
+		return response;
+	}
+
+	public boolean isMfaRequired() {
+		return mfaRequired;
+	}
+
+	public void setMfaRequired(boolean mfaRequired) {
+		this.mfaRequired = mfaRequired;
 	}
 
 	public boolean isSuccess() {
