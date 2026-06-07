@@ -10,11 +10,21 @@ public class AdmissionResponse {
 	private Long id;
 	private String applicationId;
 	private String fullName;
+	private String firstName;
+	private String lastName;
 	private LocalDate dob;
 	private String classApplying;
 	private String gender;
+	private String streetAddress;
+	private String city;
+	private String state;
+	private String zip;
 	private String parentName;
 	private String parentPhone;
+	private String parent1Email;
+	private String parent2Name;
+	private String parent2Phone;
+	private String parent2Email;
 	private ApplicationStatus status;
 	private Instant submittedAt;
 
@@ -42,6 +52,22 @@ public class AdmissionResponse {
 		this.fullName = fullName;
 	}
 
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
 	public LocalDate getDob() {
 		return dob;
 	}
@@ -66,6 +92,38 @@ public class AdmissionResponse {
 		this.gender = gender;
 	}
 
+	public String getStreetAddress() {
+		return streetAddress;
+	}
+
+	public void setStreetAddress(String streetAddress) {
+		this.streetAddress = streetAddress;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getZip() {
+		return zip;
+	}
+
+	public void setZip(String zip) {
+		this.zip = zip;
+	}
+
 	public String getParentName() {
 		return parentName;
 	}
@@ -80,6 +138,38 @@ public class AdmissionResponse {
 
 	public void setParentPhone(String parentPhone) {
 		this.parentPhone = parentPhone;
+	}
+
+	public String getParent1Email() {
+		return parent1Email;
+	}
+
+	public void setParent1Email(String parent1Email) {
+		this.parent1Email = parent1Email;
+	}
+
+	public String getParent2Name() {
+		return parent2Name;
+	}
+
+	public void setParent2Name(String parent2Name) {
+		this.parent2Name = parent2Name;
+	}
+
+	public String getParent2Phone() {
+		return parent2Phone;
+	}
+
+	public void setParent2Phone(String parent2Phone) {
+		this.parent2Phone = parent2Phone;
+	}
+
+	public String getParent2Email() {
+		return parent2Email;
+	}
+
+	public void setParent2Email(String parent2Email) {
+		this.parent2Email = parent2Email;
 	}
 
 	public ApplicationStatus getStatus() {
