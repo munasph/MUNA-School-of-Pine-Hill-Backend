@@ -2,8 +2,11 @@ package com.bezkoder.spring.jpa.postgresql.controller.admin;
 
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,6 +96,24 @@ public class AdminCmsSupportController {
 	public ResponseEntity<Void> deleteDocument(@PathVariable Long documentId) {
 		cmsSupportService.deleteDocument(documentId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/api/admin/admission-documents/{documentId}/download")
+	public ResponseEntity<Resource> downloadDocument(@PathVariable Long documentId) {
+		AdmissionDocumentResponse document = cmsSupportService.getDocument(documentId);
+		Resource resource = cmsSupportService.loadDocumentFile(documentId);
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION,
+						"attachment; filename=\"" + sanitizeFilename(document.getFileName()) + "\"")
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				.body(resource);
+	}
+
+	private static String sanitizeFilename(String filename) {
+		if (filename == null || filename.isBlank()) {
+			return "document";
+		}
+		return filename.replace("\"", "'");
 	}
 
 	@GetMapping("/api/admin/audit-logs")

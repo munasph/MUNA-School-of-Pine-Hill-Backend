@@ -1,7 +1,6 @@
 package com.bezkoder.spring.jpa.postgresql.entity.enums;
 
-public enum AdminUserRole {
-	SUPER_ADMIN,
-	ADMIN,
-	EDITOR
+public enum AdminAccountStatus {
+	ACTIVE,
+	DISABLED
 }

@@ -74,3 +74,12 @@ databaseChangeLog:
   - include:
       file: changes/024-add-admission-registration-fields.sql
       relativeToChangelogFile: true
+  - include:
+      file: changes/025-admin-auth-workflow.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/026-create-password-reset-tokens.sql
+      relativeToChangelogFile: true
+  - include:
+      file: changes/027-update-site-settings-branding.sql
+      relativeToChangelogFile: true

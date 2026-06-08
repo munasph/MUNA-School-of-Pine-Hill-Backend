@@ -2,6 +2,8 @@ package com.bezkoder.spring.jpa.postgresql.entity;
 
 import java.time.Instant;
 
+import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminAccountStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminApprovalStatus;
 import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminUserRole;
 
 import jakarta.persistence.Column;
@@ -39,6 +41,35 @@ public class AdminUser {
 	@Column(nullable = false)
 	private boolean active = true;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "approval_status", nullable = false, length = 20)
+	private AdminApprovalStatus approvalStatus = AdminApprovalStatus.APPROVED;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "account_status", nullable = false, length = 20)
+	private AdminAccountStatus accountStatus = AdminAccountStatus.ACTIVE;
+
+	@Column(name = "invited_by")
+	private Long invitedBy;
+
+	@Column(name = "approved_by")
+	private Long approvedBy;
+
+	@Column(name = "approved_at")
+	private Instant approvedAt;
+
+	@Column(name = "invite_token_hash", length = 128)
+	private String inviteTokenHash;
+
+	@Column(name = "invite_expires_at")
+	private Instant inviteExpiresAt;
+
+	@Column(name = "failed_login_attempts", nullable = false)
+	private int failedLoginAttempts = 0;
+
+	@Column(name = "lockout_until")
+	private Instant lockoutUntil;
+
 	@Column(name = "last_login_at")
 	private Instant lastLoginAt;
 
@@ -72,6 +103,24 @@ public class AdminUser {
 	public void setRole(AdminUserRole role) { this.role = role; }
 	public boolean isActive() { return active; }
 	public void setActive(boolean active) { this.active = active; }
+	public AdminApprovalStatus getApprovalStatus() { return approvalStatus; }
+	public void setApprovalStatus(AdminApprovalStatus approvalStatus) { this.approvalStatus = approvalStatus; }
+	public AdminAccountStatus getAccountStatus() { return accountStatus; }
+	public void setAccountStatus(AdminAccountStatus accountStatus) { this.accountStatus = accountStatus; }
+	public Long getInvitedBy() { return invitedBy; }
+	public void setInvitedBy(Long invitedBy) { this.invitedBy = invitedBy; }
+	public Long getApprovedBy() { return approvedBy; }
+	public void setApprovedBy(Long approvedBy) { this.approvedBy = approvedBy; }
+	public Instant getApprovedAt() { return approvedAt; }
+	public void setApprovedAt(Instant approvedAt) { this.approvedAt = approvedAt; }
+	public String getInviteTokenHash() { return inviteTokenHash; }
+	public void setInviteTokenHash(String inviteTokenHash) { this.inviteTokenHash = inviteTokenHash; }
+	public Instant getInviteExpiresAt() { return inviteExpiresAt; }
+	public void setInviteExpiresAt(Instant inviteExpiresAt) { this.inviteExpiresAt = inviteExpiresAt; }
+	public int getFailedLoginAttempts() { return failedLoginAttempts; }
+	public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+	public Instant getLockoutUntil() { return lockoutUntil; }
+	public void setLockoutUntil(Instant lockoutUntil) { this.lockoutUntil = lockoutUntil; }
 	public Instant getLastLoginAt() { return lastLoginAt; }
 	public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
 	public Instant getCreatedAt() { return createdAt; }

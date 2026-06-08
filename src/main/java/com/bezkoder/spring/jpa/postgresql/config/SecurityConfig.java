@@ -11,6 +11,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -33,13 +35,25 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
 				.cors(Customizer.withDefaults())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/signup").permitAll()
+						.requestMatchers(HttpMethod.POST,
+								"/api/auth/login",
+								"/api/auth/signup",
+								"/api/auth/staff-signup",
+								"/api/auth/set-password",
+								"/api/auth/password-reset",
+								"/api/auth/password-reset/confirm")
+						.permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/admission", "/api/admission/with-documents", "/api/contact").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/health", "/api/site-settings", "/api/announcements/active").permitAll()
 						.requestMatchers(HttpMethod.GET,
@@ -52,7 +66,8 @@ public class SecurityConfig {
 								"/api/seo/**",
 								"/api/admission/form-fields")
 								.permitAll()
-						.requestMatchers("/api/admin/**").hasRole("ADMIN")
+						.requestMatchers("/api/admin/staff/**").hasRole("SUPER_ADMIN")
+						.requestMatchers("/api/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "EDITOR")
 						.anyRequest().permitAll())
 				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

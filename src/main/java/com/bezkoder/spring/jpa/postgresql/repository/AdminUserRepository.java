@@ -1,11 +1,23 @@
 package com.bezkoder.spring.jpa.postgresql.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.bezkoder.spring.jpa.postgresql.entity.AdminUser;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminApprovalStatus;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminUserRole;
 
 public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
+
 	List<AdminUser> findAllByOrderByEmailAsc();
+
+	Optional<AdminUser> findByEmailIgnoreCase(String email);
+
+	List<AdminUser> findAllByApprovalStatusOrderByCreatedAtDesc(AdminApprovalStatus approvalStatus);
+
+	List<AdminUser> findAllByRole(AdminUserRole role);
+
+	boolean existsByEmailIgnoreCase(String email);
 }

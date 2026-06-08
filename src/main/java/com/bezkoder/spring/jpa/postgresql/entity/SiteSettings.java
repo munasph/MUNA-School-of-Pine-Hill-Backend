@@ -18,28 +18,28 @@ public class SiteSettings {
 	private Long id = SINGLETON_ID;
 
 	@Column(nullable = false, length = 200)
-	private String name = "School Name";
+	private String name = "MUNA School of Pine Hill";
 
 	@Column(name = "short_name", nullable = false, length = 100)
-	private String shortName = "School";
+	private String shortName = "MSPH";
 
 	@Column(name = "founded_year", length = 10)
-	private String foundedYear = "0000";
+	private String foundedYear = "2026";
 
 	@Column(length = 500)
-	private String address = "Street Address, City, State, Country";
+	private String address = "400 Erial Rd, Pine Hill, NJ 08021";
 
 	@Column(length = 50)
-	private String phone = "Phone Number";
+	private String phone = "856-484-6949";
 
 	@Column(length = 200)
-	private String email = "email@example.com";
+	private String email = "info@munasph.org";
 
 	@Column(name = "office_hours", length = 200)
 	private String officeHours = "Office Hours Placeholder";
 
 	@Column(name = "base_url", length = 500)
-	private String baseUrl = "https://example.com";
+	private String baseUrl = "https://munasph.org";
 
 	@Column(name = "admissions_open", nullable = false)
 	private boolean admissionsOpen = true;

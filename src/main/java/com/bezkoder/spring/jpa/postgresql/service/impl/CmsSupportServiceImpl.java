@@ -2,6 +2,8 @@ package com.bezkoder.spring.jpa.postgresql.service.impl;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import com.bezkoder.spring.jpa.postgresql.dto.cms.AuditLogResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.cms.NotificationSettingsRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.cms.NotificationSettingsResponse;
 import com.bezkoder.spring.jpa.postgresql.entity.AdminUser;
+import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminApprovalStatus;
 import com.bezkoder.spring.jpa.postgresql.entity.AdmissionDocument;
 import com.bezkoder.spring.jpa.postgresql.entity.AdmissionNote;
 import com.bezkoder.spring.jpa.postgresql.entity.AnalyticsSettings;
@@ -32,6 +35,7 @@ import com.bezkoder.spring.jpa.postgresql.repository.AnalyticsSettingsRepository
 import com.bezkoder.spring.jpa.postgresql.repository.AuditLogRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.NotificationSettingsRepository;
 import com.bezkoder.spring.jpa.postgresql.service.CmsSupportService;
+import com.bezkoder.spring.jpa.postgresql.service.FileStorageService;
 
 @Service
 @Transactional(readOnly = true)
@@ -44,6 +48,8 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 	private final AuditLogRepository auditLogRepository;
 	private final NotificationSettingsRepository notificationSettingsRepository;
 	private final AnalyticsSettingsRepository analyticsSettingsRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final FileStorageService fileStorageService;
 
 	public CmsSupportServiceImpl(
 			AdminUserRepository adminUserRepository,
@@ -52,7 +58,9 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 			AdmissionApplicationRepository applicationRepository,
 			AuditLogRepository auditLogRepository,
 			NotificationSettingsRepository notificationSettingsRepository,
-			AnalyticsSettingsRepository analyticsSettingsRepository) {
+			AnalyticsSettingsRepository analyticsSettingsRepository,
+			PasswordEncoder passwordEncoder,
+			FileStorageService fileStorageService) {
 		this.adminUserRepository = adminUserRepository;
 		this.noteRepository = noteRepository;
 		this.documentRepository = documentRepository;
@@ -60,6 +68,8 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 		this.auditLogRepository = auditLogRepository;
 		this.notificationSettingsRepository = notificationSettingsRepository;
 		this.analyticsSettingsRepository = analyticsSettingsRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.fileStorageService = fileStorageService;
 	}
 
 	@Override
@@ -75,10 +85,11 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 		}
 		AdminUser entity = new AdminUser();
 		entity.setEmail(request.getEmail());
-		entity.setPasswordHash(hashPlaceholder(request.getPassword()));
+		entity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 		entity.setDisplayName(request.getDisplayName());
 		entity.setRole(request.getRole());
 		entity.setActive(request.isActive());
+		entity.setApprovalStatus(AdminApprovalStatus.APPROVED);
 		return toUserResponse(adminUserRepository.save(entity));
 	}
 
@@ -88,7 +99,7 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 		AdminUser entity = findUserOrThrow(id);
 		entity.setEmail(request.getEmail());
 		if (request.getPassword() != null && !request.getPassword().isBlank()) {
-			entity.setPasswordHash(hashPlaceholder(request.getPassword()));
+			entity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 		}
 		entity.setDisplayName(request.getDisplayName());
 		entity.setRole(request.getRole());
@@ -154,10 +165,20 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 	@Override
 	@Transactional
 	public void deleteDocument(Long documentId) {
-		if (!documentRepository.existsById(documentId)) {
-			throw new ResourceNotFoundException("Document not found with id: " + documentId);
-		}
-		documentRepository.deleteById(documentId);
+		AdmissionDocument entity = findDocumentOrThrow(documentId);
+		fileStorageService.deleteStoredFile(entity.getFileUrl());
+		documentRepository.delete(entity);
+	}
+
+	@Override
+	public AdmissionDocumentResponse getDocument(Long documentId) {
+		return toDocumentResponse(findDocumentOrThrow(documentId));
+	}
+
+	@Override
+	public Resource loadDocumentFile(Long documentId) {
+		AdmissionDocument entity = findDocumentOrThrow(documentId);
+		return fileStorageService.loadAsResource(entity.getFileUrl());
 	}
 
 	@Override
@@ -206,6 +227,11 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
 	}
 
+	private AdmissionDocument findDocumentOrThrow(Long documentId) {
+		return documentRepository.findById(documentId)
+				.orElseThrow(() -> new ResourceNotFoundException("Document not found with id: " + documentId));
+	}
+
 	private NotificationSettings getOrCreateNotifications() {
 		return notificationSettingsRepository.findById(NotificationSettings.SINGLETON_ID)
 				.orElseGet(() -> notificationSettingsRepository.save(new NotificationSettings()));
@@ -214,10 +240,6 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 	private AnalyticsSettings getOrCreateAnalytics() {
 		return analyticsSettingsRepository.findById(AnalyticsSettings.SINGLETON_ID)
 				.orElseGet(() -> analyticsSettingsRepository.save(new AnalyticsSettings()));
-	}
-
-	private String hashPlaceholder(String password) {
-		return "SCAFFOLD:" + password;
 	}
 
 	private AdminUserResponse toUserResponse(AdminUser entity) {

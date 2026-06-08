@@ -2,6 +2,8 @@ package com.bezkoder.spring.jpa.postgresql.service;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
+
 import com.bezkoder.spring.jpa.postgresql.dto.cms.AdminUserRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.cms.AdminUserResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.cms.AdmissionDocumentRequest;
@@ -28,6 +30,8 @@ public interface CmsSupportService {
 	List<AdmissionDocumentResponse> listDocuments(Long applicationId);
 	AdmissionDocumentResponse createDocument(Long applicationId, AdmissionDocumentRequest request);
 	void deleteDocument(Long documentId);
+	AdmissionDocumentResponse getDocument(Long documentId);
+	Resource loadDocumentFile(Long documentId);
 
 	List<AuditLogResponse> listAuditLogs();
 
