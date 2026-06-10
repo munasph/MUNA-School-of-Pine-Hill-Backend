@@ -55,7 +55,7 @@ public class SecurityConfig {
 								"/api/auth/password-reset/confirm")
 						.permitAll()
 						.requestMatchers(HttpMethod.POST, "/api/admission", "/api/admission/with-documents", "/api/contact").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/health", "/api/site-settings", "/api/announcements/active").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/health", "/api/site-settings", "/api/announcements/active", "/api/announcements/*").permitAll()
 						.requestMatchers(HttpMethod.GET,
 								"/api/events",
 								"/api/news",

@@ -42,6 +42,15 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 	}
 
 	@Override
+	public AnnouncementResponse getActiveAnnouncementById(Long id) {
+		Announcement entity = findAnnouncementOrThrow(id);
+		if (!entity.isActive()) {
+			throw new ResourceNotFoundException("Announcement not found with id: " + id);
+		}
+		return toResponse(entity);
+	}
+
+	@Override
 	@Transactional
 	public AnnouncementResponse createAnnouncement(AnnouncementRequest request) {
 		return toResponse(announcementRepository.save(toEntity(new Announcement(), request)));
@@ -72,6 +81,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 		entity.setEmoji(request.getEmoji());
 		entity.setTitle(request.getTitle());
 		entity.setSubtitle(request.getSubtitle());
+		entity.setBody(request.getBody());
 		entity.setCta(request.getCta());
 		entity.setHref(request.getHref());
 		entity.setActive(request.isActive());
@@ -84,6 +94,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
 		response.setEmoji(entity.getEmoji());
 		response.setTitle(entity.getTitle());
 		response.setSubtitle(entity.getSubtitle());
+		response.setBody(entity.getBody());
 		response.setCta(entity.getCta());
 		response.setHref(entity.getHref());
 		response.setActive(entity.isActive());

@@ -13,6 +13,8 @@ public interface AnnouncementService {
 
 	AnnouncementResponse getAnnouncementById(Long id);
 
+	AnnouncementResponse getActiveAnnouncementById(Long id);
+
 	AnnouncementResponse createAnnouncement(AnnouncementRequest request);
 
 	AnnouncementResponse updateAnnouncement(Long id, AnnouncementRequest request);

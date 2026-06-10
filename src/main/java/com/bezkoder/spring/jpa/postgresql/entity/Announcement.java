@@ -29,6 +29,9 @@ public class Announcement {
 	@Column(length = 500)
 	private String subtitle;
 
+	@Column(columnDefinition = "TEXT")
+	private String body;
+
 	@Column(length = 100)
 	private String cta;
 
@@ -86,6 +89,14 @@ public class Announcement {
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
 	}
 
 	public String getCta() {

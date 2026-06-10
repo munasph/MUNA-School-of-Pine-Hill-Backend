@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +31,11 @@ public class PublicContentController {
 	@GetMapping("/announcements/active")
 	public ResponseEntity<List<AnnouncementResponse>> getActiveAnnouncements() {
 		return ResponseEntity.ok(announcementService.getActiveAnnouncements());
+	}
+
+	@GetMapping("/announcements/{id}")
+	public ResponseEntity<AnnouncementResponse> getActiveAnnouncement(@PathVariable Long id) {
+		return ResponseEntity.ok(announcementService.getActiveAnnouncementById(id));
 	}
 
 	@GetMapping("/site-settings")

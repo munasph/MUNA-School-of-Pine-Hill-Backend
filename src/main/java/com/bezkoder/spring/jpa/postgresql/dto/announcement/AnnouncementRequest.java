@@ -15,6 +15,8 @@ public class AnnouncementRequest {
 	@Size(max = 500)
 	private String subtitle;
 
+	private String body;
+
 	@Size(max = 100)
 	private String cta;
 
@@ -45,6 +47,14 @@ public class AnnouncementRequest {
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
 	}
 
 	public String getCta() {

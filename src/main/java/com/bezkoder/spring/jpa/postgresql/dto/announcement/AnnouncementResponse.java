@@ -8,6 +8,7 @@ public class AnnouncementResponse {
 	private String emoji;
 	private String title;
 	private String subtitle;
+	private String body;
 	private String cta;
 	private String href;
 	private boolean active;
@@ -44,6 +45,14 @@ public class AnnouncementResponse {
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
 	}
 
 	public String getCta() {
