@@ -1,5 +1,7 @@
 package com.bezkoder.spring.jpa.postgresql.dto.site;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,6 +38,7 @@ public class SiteSettingsRequest {
 
 	private boolean admissionsOpen = true;
 
+	@JsonProperty("admissionDocumentsRequired")
 	private boolean admissionDocumentsRequired = false;
 
 	public String getName() {

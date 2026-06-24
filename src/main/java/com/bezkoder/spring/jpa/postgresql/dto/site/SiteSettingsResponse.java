@@ -1,5 +1,7 @@
 package com.bezkoder.spring.jpa.postgresql.dto.site;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SiteSettingsResponse {
 
 	private String name;
@@ -85,7 +87,8 @@ public class SiteSettingsResponse {
 		this.admissionsOpen = admissionsOpen;
 	}
 
-	public boolean isAdmissionDocumentsRequired() {
+	@JsonProperty("admissionDocumentsRequired")
+	public boolean getAdmissionDocumentsRequired() {
 		return admissionDocumentsRequired;
 	}
 
