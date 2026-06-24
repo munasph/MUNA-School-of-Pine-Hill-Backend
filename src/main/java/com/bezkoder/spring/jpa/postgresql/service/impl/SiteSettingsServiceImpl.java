@@ -47,6 +47,7 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		entity.setOfficeHours(request.getOfficeHours());
 		entity.setBaseUrl(request.getBaseUrl());
 		entity.setAdmissionsOpen(request.isAdmissionsOpen());
+		entity.setAdmissionDocumentsRequired(request.isAdmissionDocumentsRequired());
 	}
 
 	private SiteSettingsResponse toResponse(SiteSettings entity) {
@@ -60,6 +61,7 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		response.setOfficeHours(entity.getOfficeHours());
 		response.setBaseUrl(entity.getBaseUrl());
 		response.setAdmissionsOpen(entity.isAdmissionsOpen());
+		response.setAdmissionDocumentsRequired(entity.isAdmissionDocumentsRequired());
 		return response;
 	}
 }

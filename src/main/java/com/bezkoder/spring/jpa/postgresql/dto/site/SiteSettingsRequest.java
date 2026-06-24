@@ -36,6 +36,8 @@ public class SiteSettingsRequest {
 
 	private boolean admissionsOpen = true;
 
+	private boolean admissionDocumentsRequired = false;
+
 	public String getName() {
 		return name;
 	}
@@ -106,5 +108,13 @@ public class SiteSettingsRequest {
 
 	public void setAdmissionsOpen(boolean admissionsOpen) {
 		this.admissionsOpen = admissionsOpen;
+	}
+
+	public boolean isAdmissionDocumentsRequired() {
+		return admissionDocumentsRequired;
+	}
+
+	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
+		this.admissionDocumentsRequired = admissionDocumentsRequired;
 	}
 }

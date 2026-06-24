@@ -91,7 +91,11 @@ public class AdmissionServiceImpl implements AdmissionService {
 	}
 
 	private void validateDocumentUpload(List<MultipartFile> files, List<String> docTypes) {
+		boolean documentsRequired = isAdmissionDocumentsRequired();
 		if (files == null || files.isEmpty()) {
+			if (documentsRequired) {
+				throw new BadRequestException("Required documents are missing.");
+			}
 			return;
 		}
 		if (docTypes == null || docTypes.size() != files.size()) {
@@ -115,6 +119,20 @@ public class AdmissionServiceImpl implements AdmissionService {
 				throw new BadRequestException("Uploaded file is empty.");
 			}
 		}
+
+		if (documentsRequired) {
+			for (String required : AdmissionDocumentType.REQUIRED) {
+				if (!uploadedTypes.contains(required)) {
+					throw new BadRequestException("Missing required document: " + required);
+				}
+			}
+		}
+	}
+
+	private boolean isAdmissionDocumentsRequired() {
+		return siteSettingsRepository.findById(SiteSettings.SINGLETON_ID)
+				.map(SiteSettings::isAdmissionDocumentsRequired)
+				.orElse(false);
 	}
 
 	private void saveDocuments(Long applicationId, List<MultipartFile> files, List<String> docTypes) {

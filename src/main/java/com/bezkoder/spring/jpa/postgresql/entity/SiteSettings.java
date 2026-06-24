@@ -44,6 +44,9 @@ public class SiteSettings {
 	@Column(name = "admissions_open", nullable = false)
 	private boolean admissionsOpen = true;
 
+	@Column(name = "admission_documents_required", nullable = false)
+	private boolean admissionDocumentsRequired = false;
+
 	public Long getId() {
 		return id;
 	}
@@ -122,5 +125,13 @@ public class SiteSettings {
 
 	public void setAdmissionsOpen(boolean admissionsOpen) {
 		this.admissionsOpen = admissionsOpen;
+	}
+
+	public boolean isAdmissionDocumentsRequired() {
+		return admissionDocumentsRequired;
+	}
+
+	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
+		this.admissionDocumentsRequired = admissionDocumentsRequired;
 	}
 }
