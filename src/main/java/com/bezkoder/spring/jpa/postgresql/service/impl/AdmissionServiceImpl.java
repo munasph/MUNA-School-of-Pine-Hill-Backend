@@ -69,12 +69,17 @@ public class AdmissionServiceImpl implements AdmissionService {
 		validateDocumentUpload(files, docTypes);
 
 		AdmissionApplication saved = admissionRepository.save(toEntity(request));
-		saveDocuments(saved.getId(), files, docTypes);
+		if (files != null && !files.isEmpty()) {
+			saveDocuments(saved.getId(), files, docTypes);
+		}
 
+		String message = (files == null || files.isEmpty())
+				? "Application received."
+				: "Registration and documents received.";
 		return new AdmissionSubmitResponse(
 				true,
 				saved.getApplicationId(),
-				"Registration and documents received.");
+				message);
 	}
 
 	private void assertAdmissionsOpen() {
@@ -87,7 +92,7 @@ public class AdmissionServiceImpl implements AdmissionService {
 
 	private void validateDocumentUpload(List<MultipartFile> files, List<String> docTypes) {
 		if (files == null || files.isEmpty()) {
-			throw new BadRequestException("Required documents are missing.");
+			return;
 		}
 		if (docTypes == null || docTypes.size() != files.size()) {
 			throw new BadRequestException("Document upload metadata is invalid.");
@@ -108,12 +113,6 @@ public class AdmissionServiceImpl implements AdmissionService {
 			MultipartFile file = files.get(i);
 			if (file == null || file.isEmpty()) {
 				throw new BadRequestException("Uploaded file is empty.");
-			}
-		}
-
-		for (String required : AdmissionDocumentType.REQUIRED) {
-			if (!uploadedTypes.contains(required)) {
-				throw new BadRequestException("Missing required document: " + required);
 			}
 		}
 	}
