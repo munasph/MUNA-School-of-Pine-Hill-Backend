@@ -47,6 +47,9 @@ public class SiteSettings {
 	@Column(name = "admission_documents_required", nullable = false)
 	private boolean admissionDocumentsRequired = false;
 
+	@Column(name = "admission_required_document_types", nullable = false, columnDefinition = "TEXT")
+	private String admissionRequiredDocumentTypes = "[]";
+
 	public Long getId() {
 		return id;
 	}
@@ -133,5 +136,13 @@ public class SiteSettings {
 
 	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
 		this.admissionDocumentsRequired = admissionDocumentsRequired;
+	}
+
+	public String getAdmissionRequiredDocumentTypes() {
+		return admissionRequiredDocumentTypes;
+	}
+
+	public void setAdmissionRequiredDocumentTypes(String admissionRequiredDocumentTypes) {
+		this.admissionRequiredDocumentTypes = admissionRequiredDocumentTypes;
 	}
 }

@@ -1,5 +1,8 @@
 package com.bezkoder.spring.jpa.postgresql.dto.site;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SiteSettingsResponse {
@@ -14,6 +17,7 @@ public class SiteSettingsResponse {
 	private String baseUrl;
 	private boolean admissionsOpen;
 	private boolean admissionDocumentsRequired;
+	private List<String> admissionRequiredDocumentTypes = new ArrayList<>();
 
 	public String getName() {
 		return name;
@@ -94,5 +98,13 @@ public class SiteSettingsResponse {
 
 	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
 		this.admissionDocumentsRequired = admissionDocumentsRequired;
+	}
+
+	public List<String> getAdmissionRequiredDocumentTypes() {
+		return admissionRequiredDocumentTypes;
+	}
+
+	public void setAdmissionRequiredDocumentTypes(List<String> admissionRequiredDocumentTypes) {
+		this.admissionRequiredDocumentTypes = admissionRequiredDocumentTypes;
 	}
 }

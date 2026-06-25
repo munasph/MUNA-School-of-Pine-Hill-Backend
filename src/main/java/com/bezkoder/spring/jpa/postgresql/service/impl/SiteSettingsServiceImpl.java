@@ -3,6 +3,9 @@ package com.bezkoder.spring.jpa.postgresql.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import com.bezkoder.spring.jpa.postgresql.admission.AdmissionRequiredDocuments;
 import com.bezkoder.spring.jpa.postgresql.dto.site.SiteSettingsRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.site.SiteSettingsResponse;
 import com.bezkoder.spring.jpa.postgresql.entity.SiteSettings;
@@ -47,7 +50,11 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		entity.setOfficeHours(request.getOfficeHours());
 		entity.setBaseUrl(request.getBaseUrl());
 		entity.setAdmissionsOpen(request.isAdmissionsOpen());
-		entity.setAdmissionDocumentsRequired(request.isAdmissionDocumentsRequired());
+
+		List<String> requiredDocuments = AdmissionRequiredDocuments.sanitize(
+				request.getAdmissionRequiredDocumentTypes());
+		entity.setAdmissionRequiredDocumentTypes(AdmissionRequiredDocuments.serialize(requiredDocuments));
+		entity.setAdmissionDocumentsRequired(!requiredDocuments.isEmpty());
 	}
 
 	private SiteSettingsResponse toResponse(SiteSettings entity) {
@@ -61,7 +68,11 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		response.setOfficeHours(entity.getOfficeHours());
 		response.setBaseUrl(entity.getBaseUrl());
 		response.setAdmissionsOpen(entity.isAdmissionsOpen());
-		response.setAdmissionDocumentsRequired(entity.isAdmissionDocumentsRequired());
+
+		List<String> requiredDocuments = AdmissionRequiredDocuments.parse(
+				entity.getAdmissionRequiredDocumentTypes());
+		response.setAdmissionRequiredDocumentTypes(requiredDocuments);
+		response.setAdmissionDocumentsRequired(!requiredDocuments.isEmpty());
 		return response;
 	}
 }

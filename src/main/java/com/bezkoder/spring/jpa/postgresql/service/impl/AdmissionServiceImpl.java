@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bezkoder.spring.jpa.postgresql.admission.AdmissionDocumentType;
+import com.bezkoder.spring.jpa.postgresql.admission.AdmissionRequiredDocuments;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.AdmissionResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.AdmissionSubmitResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.admission.CreateAdmissionRequest;
@@ -91,12 +92,16 @@ public class AdmissionServiceImpl implements AdmissionService {
 	}
 
 	private void validateDocumentUpload(List<MultipartFile> files, List<String> docTypes) {
-		boolean documentsRequired = isAdmissionDocumentsRequired();
-		if (files == null || files.isEmpty()) {
-			if (documentsRequired) {
-				throw new BadRequestException("Required documents are missing.");
+		List<String> requiredTypes = getRequiredDocumentTypes();
+		if (requiredTypes.isEmpty()) {
+			if (files != null && !files.isEmpty()) {
+				throw new BadRequestException("Document uploads are not enabled for registration.");
 			}
 			return;
+		}
+
+		if (files == null || files.isEmpty()) {
+			throw new BadRequestException("Required documents are missing.");
 		}
 		if (docTypes == null || docTypes.size() != files.size()) {
 			throw new BadRequestException("Document upload metadata is invalid.");
@@ -111,6 +116,9 @@ public class AdmissionServiceImpl implements AdmissionService {
 			if (!AdmissionDocumentType.ALLOWED.contains(docType)) {
 				throw new BadRequestException("Unsupported document type: " + docType);
 			}
+			if (!requiredTypes.contains(docType)) {
+				throw new BadRequestException("Document type is not enabled for registration: " + docType);
+			}
 			if (!uploadedTypes.add(docType)) {
 				throw new BadRequestException("Duplicate document upload: " + docType);
 			}
@@ -120,19 +128,17 @@ public class AdmissionServiceImpl implements AdmissionService {
 			}
 		}
 
-		if (documentsRequired) {
-			for (String required : AdmissionDocumentType.REQUIRED) {
-				if (!uploadedTypes.contains(required)) {
-					throw new BadRequestException("Missing required document: " + required);
-				}
+		for (String required : requiredTypes) {
+			if (!uploadedTypes.contains(required)) {
+				throw new BadRequestException("Missing required document: " + required);
 			}
 		}
 	}
 
-	private boolean isAdmissionDocumentsRequired() {
+	private List<String> getRequiredDocumentTypes() {
 		return siteSettingsRepository.findById(SiteSettings.SINGLETON_ID)
-				.map(SiteSettings::isAdmissionDocumentsRequired)
-				.orElse(false);
+				.map(settings -> AdmissionRequiredDocuments.parse(settings.getAdmissionRequiredDocumentTypes()))
+				.orElse(List.of());
 	}
 
 	private void saveDocuments(Long applicationId, List<MultipartFile> files, List<String> docTypes) {
