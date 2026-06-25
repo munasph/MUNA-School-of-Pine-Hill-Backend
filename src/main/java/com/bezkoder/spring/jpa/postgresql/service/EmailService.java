@@ -12,5 +12,11 @@ public interface EmailService {
 
 	void sendPasswordReset(String toEmail, String resetUrl);
 
+	void sendPasswordResetEmail(String toEmail, String fullName, String resetUrl);
+
+	void sendMagicLinkEmail(String toEmail, String fullName, String magicLinkUrl);
+
+	void sendVerificationEmail(String toEmail, String fullName, String verifyUrl);
+
 	void sendPlain(String toEmail, String subject, String body);
 }

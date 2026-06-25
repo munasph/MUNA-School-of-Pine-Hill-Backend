@@ -77,6 +77,38 @@ public class EmailServiceImpl implements EmailService {
 	}
 
 	@Override
+	public void sendPasswordResetEmail(String toEmail, String fullName, String resetUrl) {
+		send(
+				toEmail,
+				"Reset your portal password",
+				"Hello " + fullName + ",\n\n"
+						+ "Use the link below to reset your password:\n\n"
+						+ resetUrl + "\n\n"
+						+ "This link expires in 1 hour.");
+	}
+
+	@Override
+	public void sendMagicLinkEmail(String toEmail, String fullName, String magicLinkUrl) {
+		send(
+				toEmail,
+				"Your portal sign-in link",
+				"Hello " + fullName + ",\n\n"
+						+ "Use the link below to sign in:\n\n"
+						+ magicLinkUrl + "\n\n"
+						+ "This link expires in 15 minutes.");
+	}
+
+	@Override
+	public void sendVerificationEmail(String toEmail, String fullName, String verifyUrl) {
+		send(
+				toEmail,
+				"Verify your portal email",
+				"Hello " + fullName + ",\n\n"
+						+ "Please verify your email address:\n\n"
+						+ verifyUrl);
+	}
+
+	@Override
 	public void sendPlain(String toEmail, String subject, String body) {
 		send(toEmail, subject, body);
 	}

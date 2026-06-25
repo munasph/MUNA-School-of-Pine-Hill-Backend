@@ -73,6 +73,12 @@ public class AdminUser {
 	@Column(name = "last_login_at")
 	private Instant lastLoginAt;
 
+	@Column(name = "mfa_enabled", nullable = false)
+	private boolean mfaEnabled = false;
+
+	@Column(name = "mfa_secret", length = 64)
+	private String mfaSecret;
+
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
@@ -123,6 +129,10 @@ public class AdminUser {
 	public void setLockoutUntil(Instant lockoutUntil) { this.lockoutUntil = lockoutUntil; }
 	public Instant getLastLoginAt() { return lastLoginAt; }
 	public void setLastLoginAt(Instant lastLoginAt) { this.lastLoginAt = lastLoginAt; }
+	public boolean isMfaEnabled() { return mfaEnabled; }
+	public void setMfaEnabled(boolean mfaEnabled) { this.mfaEnabled = mfaEnabled; }
+	public String getMfaSecret() { return mfaSecret; }
+	public void setMfaSecret(String mfaSecret) { this.mfaSecret = mfaSecret; }
 	public Instant getCreatedAt() { return createdAt; }
 	public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 	public Instant getUpdatedAt() { return updatedAt; }

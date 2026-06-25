@@ -19,6 +19,10 @@ public final class SecureTokens {
 		return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 	}
 
+	public static String randomToken() {
+		return generateRawToken();
+	}
+
 	public static String hashToken(String rawToken) {
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -27,5 +31,9 @@ public final class SecureTokens {
 		} catch (NoSuchAlgorithmException ex) {
 			throw new IllegalStateException("SHA-256 not available", ex);
 		}
+	}
+
+	public static String hash(String rawToken) {
+		return hashToken(rawToken);
 	}
 }

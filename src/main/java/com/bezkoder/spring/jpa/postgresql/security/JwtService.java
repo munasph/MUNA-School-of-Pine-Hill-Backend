@@ -39,6 +39,10 @@ public class JwtService {
 				.compact();
 	}
 
+	public String generatePortalToken(String email, List<String> roles) {
+		return generateToken(email, roles);
+	}
+
 	public Claims parseClaims(String token) {
 		return Jwts.parser()
 				.verifyWith(signingKey)

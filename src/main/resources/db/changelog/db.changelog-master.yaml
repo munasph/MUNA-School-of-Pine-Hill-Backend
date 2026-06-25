@@ -87,5 +87,8 @@ databaseChangeLog:
       file: changes/028-add-announcement-body.sql
       relativeToChangelogFile: true
   - include:
+      file: changes/028-add-admin-mfa-columns.sql
+      relativeToChangelogFile: true
+  - include:
       file: changes/030-add-admission-documents-required-setting.sql
       relativeToChangelogFile: true
