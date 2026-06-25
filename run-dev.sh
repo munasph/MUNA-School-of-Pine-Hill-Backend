@@ -13,4 +13,4 @@ source .env
 set +a
 
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk}"
-exec ./mvnw spring-boot:run "$@"
+exec ./mvnw spring-boot:run -Dspring-boot.run.profiles=local "$@"

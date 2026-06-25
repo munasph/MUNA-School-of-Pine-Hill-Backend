@@ -31,7 +31,7 @@ import com.bezkoder.spring.jpa.postgresql.security.SecureTokens;
 import com.bezkoder.spring.jpa.postgresql.security.TotpService;
 import com.bezkoder.spring.jpa.postgresql.service.AuthAuditService;
 import com.bezkoder.spring.jpa.postgresql.service.EmailService;
-import com.bezkoder.spring.jpa.postgresql.service.LoginRateLimiter;
+import com.bezkoder.spring.jpa.postgresql.security.LoginRateLimiter;
 import com.bezkoder.spring.jpa.postgresql.service.PortalAuthService;
 
 @Service
@@ -70,7 +70,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 			EmailService emailService,
 			AuthAuditService auditService,
 			LoginRateLimiter rateLimiter,
-			@Value("${app.frontend.base-url}") String frontendBaseUrl,
+			@Value("${app.frontend.url:http://localhost:4200}") String frontendBaseUrl,
 			@Value("${app.security.max-failed-logins:5}") int maxFailedLogins,
 			@Value("${app.security.lockout-minutes:15}") int lockoutMinutes,
 			@Value("${app.security.email-token-ttl-minutes:1440}") int emailTokenTtlMinutes,
@@ -99,7 +99,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 	@Override
 	@Transactional
 	public PortalAuthResponse signup(PortalSignupRequest request, String clientIp) {
-		rateLimiter.checkAndIncrement("signup:" + clientIp);
+		rateLimiter.assertAllowed("signup:" + clientIp);
 
 		if (!request.getPassword().equals(request.getConfirmPassword())) {
 			throw new BadRequestException("Passwords do not match.");
@@ -132,7 +132,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 	@Transactional
 	public PortalAuthResponse login(PortalLoginRequest request, String clientIp) {
 		String email = request.getEmail().trim().toLowerCase();
-		rateLimiter.checkAndIncrement("login:" + clientIp + ":" + email);
+		rateLimiter.assertAllowed("login:" + clientIp + ":" + email);
 
 		PortalUser user = portalUserRepository.findByEmailIgnoreCase(email)
 				.orElseThrow(() -> new UnauthorizedException("Invalid email or password."));
@@ -213,7 +213,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 	@Override
 	@Transactional
 	public PortalAuthResponse forgotPassword(ForgotPasswordRequest request, String clientIp) {
-		rateLimiter.checkAndIncrement("forgot:" + clientIp);
+		rateLimiter.assertAllowed("forgot:" + clientIp);
 		String email = request.getEmail().trim().toLowerCase();
 
 		Optional<PortalUser> maybeUser = portalUserRepository.findByEmailIgnoreCase(email);
@@ -271,7 +271,7 @@ public class PortalAuthServiceImpl implements PortalAuthService {
 		if (!magicLinkEnabled) {
 			throw new BadRequestException("Magic-link login is not available.");
 		}
-		rateLimiter.checkAndIncrement("magic:" + clientIp);
+		rateLimiter.assertAllowed("magic:" + clientIp);
 		String normalized = email.trim().toLowerCase();
 
 		portalUserRepository.findByEmailIgnoreCase(normalized).ifPresent(user -> {
