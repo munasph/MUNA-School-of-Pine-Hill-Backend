@@ -33,7 +33,7 @@ public class SiteSettings {
 	private String phone = "856-484-6949";
 
 	@Column(length = 200)
-	private String email = "info@munasph.org";
+	private String email = "admin@munasph.org";
 
 	@Column(name = "office_hours", length = 200)
 	private String officeHours = "Office Hours Placeholder";
