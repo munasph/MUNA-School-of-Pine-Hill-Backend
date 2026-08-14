@@ -50,6 +50,9 @@ public class SiteSettings {
 	@Column(name = "admission_required_document_types", nullable = false, columnDefinition = "TEXT")
 	private String admissionRequiredDocumentTypes = "[]";
 
+	@Column(name = "campaign_flyer_enabled", nullable = false)
+	private boolean campaignFlyerEnabled = true;
+
 	public Long getId() {
 		return id;
 	}
@@ -144,5 +147,13 @@ public class SiteSettings {
 
 	public void setAdmissionRequiredDocumentTypes(String admissionRequiredDocumentTypes) {
 		this.admissionRequiredDocumentTypes = admissionRequiredDocumentTypes;
+	}
+
+	public boolean isCampaignFlyerEnabled() {
+		return campaignFlyerEnabled;
+	}
+
+	public void setCampaignFlyerEnabled(boolean campaignFlyerEnabled) {
+		this.campaignFlyerEnabled = campaignFlyerEnabled;
 	}
 }

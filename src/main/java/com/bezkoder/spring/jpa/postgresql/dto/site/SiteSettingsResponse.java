@@ -17,6 +17,7 @@ public class SiteSettingsResponse {
 	private String baseUrl;
 	private boolean admissionsOpen;
 	private boolean admissionDocumentsRequired;
+	private boolean campaignFlyerEnabled;
 	private List<String> admissionRequiredDocumentTypes = new ArrayList<>();
 
 	public String getName() {
@@ -98,6 +99,14 @@ public class SiteSettingsResponse {
 
 	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
 		this.admissionDocumentsRequired = admissionDocumentsRequired;
+	}
+
+	public boolean isCampaignFlyerEnabled() {
+		return campaignFlyerEnabled;
+	}
+
+	public void setCampaignFlyerEnabled(boolean campaignFlyerEnabled) {
+		this.campaignFlyerEnabled = campaignFlyerEnabled;
 	}
 
 	public List<String> getAdmissionRequiredDocumentTypes() {

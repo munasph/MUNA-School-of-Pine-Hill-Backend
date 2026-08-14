@@ -50,6 +50,7 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		entity.setOfficeHours(request.getOfficeHours());
 		entity.setBaseUrl(request.getBaseUrl());
 		entity.setAdmissionsOpen(request.isAdmissionsOpen());
+		entity.setCampaignFlyerEnabled(request.isCampaignFlyerEnabled());
 
 		List<String> requiredDocuments = AdmissionRequiredDocuments.sanitize(
 				request.getAdmissionRequiredDocumentTypes());
@@ -68,6 +69,7 @@ public class SiteSettingsServiceImpl implements SiteSettingsService {
 		response.setOfficeHours(entity.getOfficeHours());
 		response.setBaseUrl(entity.getBaseUrl());
 		response.setAdmissionsOpen(entity.isAdmissionsOpen());
+		response.setCampaignFlyerEnabled(entity.isCampaignFlyerEnabled());
 
 		List<String> requiredDocuments = AdmissionRequiredDocuments.parse(
 				entity.getAdmissionRequiredDocumentTypes());

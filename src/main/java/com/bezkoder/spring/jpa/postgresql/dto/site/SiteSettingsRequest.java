@@ -44,6 +44,8 @@ public class SiteSettingsRequest {
 	@JsonProperty("admissionDocumentsRequired")
 	private boolean admissionDocumentsRequired = false;
 
+	private boolean campaignFlyerEnabled = true;
+
 	private List<String> admissionRequiredDocumentTypes = new ArrayList<>();
 
 	public String getName() {
@@ -124,6 +126,14 @@ public class SiteSettingsRequest {
 
 	public void setAdmissionDocumentsRequired(boolean admissionDocumentsRequired) {
 		this.admissionDocumentsRequired = admissionDocumentsRequired;
+	}
+
+	public boolean isCampaignFlyerEnabled() {
+		return campaignFlyerEnabled;
+	}
+
+	public void setCampaignFlyerEnabled(boolean campaignFlyerEnabled) {
+		this.campaignFlyerEnabled = campaignFlyerEnabled;
 	}
 
 	public List<String> getAdmissionRequiredDocumentTypes() {
