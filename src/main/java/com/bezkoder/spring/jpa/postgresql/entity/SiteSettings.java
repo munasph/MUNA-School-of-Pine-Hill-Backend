@@ -27,7 +27,7 @@ public class SiteSettings {
 	private String foundedYear = "2026";
 
 	@Column(length = 500)
-	private String address = "400 Erial Rd, Pine Hill, NJ 08021";
+	private String address = "400 Erial Rd, Pine Hill, NJ 08021 (Second Floor)";
 
 	@Column(length = 50)
 	private String phone = "856-484-6949";
