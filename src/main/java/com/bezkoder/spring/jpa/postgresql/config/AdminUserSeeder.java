@@ -59,10 +59,14 @@ public class AdminUserSeeder implements ApplicationRunner {
 			return;
 		}
 
-		AdminUser user = adminUserRepository.findByEmailIgnoreCase(email.trim())
+		String normalizedEmail = email.trim().toLowerCase();
+		AdminUser user = adminUserRepository.findByEmailIgnoreCase(normalizedEmail)
 				.orElseGet(AdminUser::new);
 
-		user.setEmail(email.trim().toLowerCase());
+		user.setEmail(normalizedEmail);
+		if (user.getUsername() == null || user.getUsername().isBlank()) {
+			user.setUsername(deriveUsername(normalizedEmail));
+		}
 		user.setPasswordHash(passwordEncoder.encode(password));
 		user.setDisplayName(displayName);
 		user.setRole(AdminUserRole.SUPER_ADMIN);
@@ -72,6 +76,23 @@ public class AdminUserSeeder implements ApplicationRunner {
 		user.setInviteTokenHash(null);
 		user.setInviteExpiresAt(null);
 		adminUserRepository.save(user);
-		log.info("Ensured super admin account exists for {}", user.getEmail());
+		log.info("Ensured super admin account exists for {} ({})", user.getEmail(), user.getUsername());
+	}
+
+	private String deriveUsername(String email) {
+		String base = email.split("@")[0].replaceAll("[^a-zA-Z0-9._-]", "").toLowerCase();
+		if (base.length() < 3) {
+			base = "admin";
+		}
+		if (base.length() > 40) {
+			base = base.substring(0, 40);
+		}
+		String candidate = base;
+		int suffix = 1;
+		while (adminUserRepository.existsByUsernameIgnoreCase(candidate)) {
+			candidate = base + suffix;
+			suffix++;
+		}
+		return candidate;
 	}
 }

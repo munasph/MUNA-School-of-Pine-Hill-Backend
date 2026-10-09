@@ -26,6 +26,7 @@ import com.bezkoder.spring.jpa.postgresql.exception.UnauthorizedException;
 import com.bezkoder.spring.jpa.postgresql.repository.AdminUserRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.PasswordResetTokenRepository;
 import com.bezkoder.spring.jpa.postgresql.security.PasswordPolicy;
+import com.bezkoder.spring.jpa.postgresql.security.UsernamePolicy;
 import com.bezkoder.spring.jpa.postgresql.security.SecureTokens;
 import com.bezkoder.spring.jpa.postgresql.service.AuthAuditService;
 import com.bezkoder.spring.jpa.postgresql.service.EmailService;
@@ -82,14 +83,19 @@ public class StaffServiceImpl implements StaffService {
 		validateStaffRole(request.getRole());
 
 		String email = normalizeEmail(request.getEmail());
+		String username = UsernamePolicy.normalize(request.getUsername());
 		if (adminUserRepository.existsByEmailIgnoreCase(email)) {
 			throw new BadRequestException("A user with this email already exists.");
+		}
+		if (adminUserRepository.existsByUsernameIgnoreCase(username)) {
+			throw new BadRequestException("That username is already taken.");
 		}
 
 		String rawToken = SecureTokens.generateRawToken();
 		AdminUser inviter = findByEmailOrThrow(actorEmail);
 		AdminUser user = new AdminUser();
 		user.setEmail(email);
+		user.setUsername(username);
 		user.setDisplayName(request.getDisplayName().trim());
 		user.setRole(request.getRole());
 		user.setActive(true);
@@ -166,12 +172,17 @@ public class StaffServiceImpl implements StaffService {
 		validateStaffRole(request.getRole());
 
 		String email = normalizeEmail(request.getEmail());
+		String username = UsernamePolicy.normalize(request.getUsername());
 		if (adminUserRepository.existsByEmailIgnoreCase(email)) {
 			throw new BadRequestException("A user with this email already exists.");
+		}
+		if (adminUserRepository.existsByUsernameIgnoreCase(username)) {
+			throw new BadRequestException("That username is already taken.");
 		}
 
 		AdminUser user = new AdminUser();
 		user.setEmail(email);
+		user.setUsername(username);
 		user.setDisplayName(request.getFullName().trim());
 		user.setRole(request.getRole());
 		user.setActive(true);
@@ -186,11 +197,11 @@ public class StaffServiceImpl implements StaffService {
 					superAdmin.getEmail(),
 					"New staff access request",
 					"A new staff access request was submitted by "
-							+ request.getFullName().trim() + " (" + email + "). "
+							+ request.getFullName().trim() + " (" + username + " / " + email + "). "
 							+ "Review pending requests in the admin portal.");
 		}
 		authAuditService.log("STAFF_SIGNUP_REQUESTED", "admin_user", email, email,
-				"Staff signup requested for " + email);
+				"Staff signup requested for " + username + " / " + email);
 	}
 
 	@Override
@@ -303,6 +314,7 @@ public class StaffServiceImpl implements StaffService {
 		StaffMemberResponse response = new StaffMemberResponse();
 		response.setId(entity.getId());
 		response.setEmail(entity.getEmail());
+		response.setUsername(entity.getUsername());
 		response.setDisplayName(entity.getDisplayName());
 		response.setRole(entity.getRole());
 		response.setApprovalStatus(entity.getApprovalStatus());

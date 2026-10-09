@@ -49,17 +49,18 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	@Transactional
 	public AuthResponse login(LoginRequest request) {
-		String email = request.getEmail().trim().toLowerCase();
+		String identifier = request.getUsername().trim().toLowerCase();
 		try {
-			loginRateLimiter.assertAllowed(email);
+			loginRateLimiter.assertAllowed(identifier);
 		} catch (IllegalStateException ex) {
 			throw new UnauthorizedException(ex.getMessage());
 		}
 
-		AdminUser admin = adminUserRepository.findByEmailIgnoreCase(email)
+		AdminUser admin = adminUserRepository
+				.findByUsernameIgnoreCaseOrEmailIgnoreCase(identifier, identifier)
 				.orElseThrow(() -> {
-					authAuditService.log("LOGIN_FAILED", "admin_user", email, email, "Unknown email");
-					return new UnauthorizedException("Invalid email or password.");
+					authAuditService.log("LOGIN_FAILED", "admin_user", identifier, identifier, "Unknown username");
+					return new UnauthorizedException("Invalid username or password.");
 				});
 
 		if (admin.getLockoutUntil() != null && admin.getLockoutUntil().isAfter(Instant.now())) {
@@ -80,22 +81,23 @@ public class AuthServiceImpl implements AuthService {
 
 		if (!passwordEncoder.matches(request.getPassword(), admin.getPasswordHash())) {
 			registerFailedAttempt(admin);
-			authAuditService.log("LOGIN_FAILED", "admin_user", admin.getId().toString(), email, "Bad password");
-			throw new UnauthorizedException("Invalid email or password.");
+			authAuditService.log("LOGIN_FAILED", "admin_user", admin.getId().toString(), identifier, "Bad password");
+			throw new UnauthorizedException("Invalid username or password.");
 		}
 
 		admin.setFailedLoginAttempts(0);
 		admin.setLockoutUntil(null);
 		admin.setLastLoginAt(Instant.now());
 		adminUserRepository.save(admin);
-		loginRateLimiter.reset(email);
+		loginRateLimiter.reset(identifier);
 
 		List<String> roles = List.of(admin.getRole().name());
 		AuthResponse response = new AuthResponse(true, "Login successful.");
 		response.setToken(jwtService.generateToken(admin.getEmail(), roles));
 		response.setEmail(admin.getEmail());
+		response.setUsername(admin.getUsername());
 		response.setRoles(roles);
-		authAuditService.log("LOGIN_SUCCESS", "admin_user", admin.getId().toString(), email, "Admin login");
+		authAuditService.log("LOGIN_SUCCESS", "admin_user", admin.getId().toString(), identifier, "Admin login");
 		return response;
 	}
 

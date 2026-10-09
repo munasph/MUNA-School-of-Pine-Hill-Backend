@@ -27,6 +27,7 @@ import com.bezkoder.spring.jpa.postgresql.entity.AuditLog;
 import com.bezkoder.spring.jpa.postgresql.entity.NotificationSettings;
 import com.bezkoder.spring.jpa.postgresql.exception.BadRequestException;
 import com.bezkoder.spring.jpa.postgresql.exception.ResourceNotFoundException;
+import com.bezkoder.spring.jpa.postgresql.security.UsernamePolicy;
 import com.bezkoder.spring.jpa.postgresql.repository.AdminUserRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.AdmissionApplicationRepository;
 import com.bezkoder.spring.jpa.postgresql.repository.AdmissionDocumentRepository;
@@ -83,8 +84,17 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 		if (request.getPassword() == null || request.getPassword().isBlank()) {
 			throw new BadRequestException("Password is required when creating a user.");
 		}
+		String email = request.getEmail().trim().toLowerCase();
+		String username = resolveUsername(request.getUsername(), email);
+		if (adminUserRepository.existsByEmailIgnoreCase(email)) {
+			throw new BadRequestException("A user with this email already exists.");
+		}
+		if (adminUserRepository.existsByUsernameIgnoreCase(username)) {
+			throw new BadRequestException("That username is already taken.");
+		}
 		AdminUser entity = new AdminUser();
-		entity.setEmail(request.getEmail());
+		entity.setEmail(email);
+		entity.setUsername(username);
 		entity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 		entity.setDisplayName(request.getDisplayName());
 		entity.setRole(request.getRole());
@@ -97,7 +107,15 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 	@Transactional
 	public AdminUserResponse updateUser(Long id, AdminUserRequest request) {
 		AdminUser entity = findUserOrThrow(id);
-		entity.setEmail(request.getEmail());
+		entity.setEmail(request.getEmail().trim().toLowerCase());
+		if (request.getUsername() != null && !request.getUsername().isBlank()) {
+			String username = UsernamePolicy.normalize(request.getUsername());
+			if (!username.equalsIgnoreCase(entity.getUsername())
+					&& adminUserRepository.existsByUsernameIgnoreCase(username)) {
+				throw new BadRequestException("That username is already taken.");
+			}
+			entity.setUsername(username);
+		}
 		if (request.getPassword() != null && !request.getPassword().isBlank()) {
 			entity.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 		}
@@ -246,12 +264,33 @@ public class CmsSupportServiceImpl implements CmsSupportService {
 		AdminUserResponse r = new AdminUserResponse();
 		r.setId(entity.getId());
 		r.setEmail(entity.getEmail());
+		r.setUsername(entity.getUsername());
 		r.setDisplayName(entity.getDisplayName());
 		r.setRole(entity.getRole());
 		r.setActive(entity.isActive());
 		r.setLastLoginAt(entity.getLastLoginAt());
 		r.setCreatedAt(entity.getCreatedAt());
 		return r;
+	}
+
+	private String resolveUsername(String requested, String email) {
+		if (requested != null && !requested.isBlank()) {
+			return UsernamePolicy.normalize(requested);
+		}
+		String base = email.split("@")[0].replaceAll("[^a-zA-Z0-9._-]", "").toLowerCase();
+		if (base.length() < 3) {
+			base = "user";
+		}
+		if (base.length() > 40) {
+			base = base.substring(0, 40);
+		}
+		String candidate = base;
+		int suffix = 1;
+		while (adminUserRepository.existsByUsernameIgnoreCase(candidate)) {
+			candidate = base + suffix;
+			suffix++;
+		}
+		return candidate;
 	}
 
 	private AdmissionNoteResponse toNoteResponse(AdmissionNote entity) {

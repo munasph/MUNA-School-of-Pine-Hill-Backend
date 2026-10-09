@@ -1,25 +1,25 @@
 package com.bezkoder.spring.jpa.postgresql.dto.auth;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class LoginRequest {
 
+	/** Username or email. */
 	@NotBlank
-	@Email
-	private String email;
+	@Size(min = 3, max = 200)
+	private String username;
 
 	@NotBlank
 	@Size(min = 8, max = 100)
 	private String password;
 
-	public String getEmail() {
-		return email;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
