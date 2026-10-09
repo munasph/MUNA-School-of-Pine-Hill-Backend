@@ -38,16 +38,6 @@ public class EmailServiceImpl implements EmailService {
 	}
 
 	@Override
-	public void sendStaffSignupReceived(String toEmail, String fullName) {
-		send(
-				toEmail,
-				"Staff access request received",
-				"Hello " + fullName + ",\n\n"
-						+ "We received your request for staff access to the MUNA School admin portal. "
-						+ "A super admin will review your request and email you when it is approved.");
-	}
-
-	@Override
 	public void sendStaffApproved(String toEmail, String fullName) {
 		send(
 				toEmail,

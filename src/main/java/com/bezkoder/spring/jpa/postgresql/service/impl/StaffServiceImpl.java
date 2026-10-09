@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.PasswordResetConfirmRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.PasswordResetRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.SetPasswordRequest;
-import com.bezkoder.spring.jpa.postgresql.dto.auth.StaffSignupRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.staff.StaffInviteRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.staff.StaffMemberResponse;
 import com.bezkoder.spring.jpa.postgresql.entity.AdminUser;
@@ -160,48 +159,6 @@ public class StaffServiceImpl implements StaffService {
 				"Rejected " + saved.getEmail());
 
 		return toResponse(saved);
-	}
-
-	@Override
-	@Transactional
-	public void submitStaffSignup(StaffSignupRequest request) {
-		if (!request.getPassword().equals(request.getConfirmPassword())) {
-			throw new BadRequestException("Passwords do not match.");
-		}
-		PasswordPolicy.validate(request.getPassword());
-		validateStaffRole(request.getRole());
-
-		String email = normalizeEmail(request.getEmail());
-		String username = UsernamePolicy.normalize(request.getUsername());
-		if (adminUserRepository.existsByEmailIgnoreCase(email)) {
-			throw new BadRequestException("A user with this email already exists.");
-		}
-		if (adminUserRepository.existsByUsernameIgnoreCase(username)) {
-			throw new BadRequestException("That username is already taken.");
-		}
-
-		AdminUser user = new AdminUser();
-		user.setEmail(email);
-		user.setUsername(username);
-		user.setDisplayName(request.getFullName().trim());
-		user.setRole(request.getRole());
-		user.setActive(true);
-		user.setApprovalStatus(AdminApprovalStatus.PENDING);
-		user.setAccountStatus(AdminAccountStatus.ACTIVE);
-		user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-		adminUserRepository.save(user);
-
-		emailService.sendStaffSignupReceived(email, request.getFullName().trim());
-		for (AdminUser superAdmin : adminUserRepository.findAllByRole(AdminUserRole.SUPER_ADMIN)) {
-			emailService.sendPlain(
-					superAdmin.getEmail(),
-					"New staff access request",
-					"A new staff access request was submitted by "
-							+ request.getFullName().trim() + " (" + username + " / " + email + "). "
-							+ "Review pending requests in the admin portal.");
-		}
-		authAuditService.log("STAFF_SIGNUP_REQUESTED", "admin_user", email, email,
-				"Staff signup requested for " + username + " / " + email);
 	}
 
 	@Override

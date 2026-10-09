@@ -4,8 +4,6 @@ public interface EmailService {
 
 	void sendStaffInvite(String toEmail, String setPasswordUrl);
 
-	void sendStaffSignupReceived(String toEmail, String fullName);
-
 	void sendStaffApproved(String toEmail, String fullName);
 
 	void sendStaffRejected(String toEmail, String fullName);

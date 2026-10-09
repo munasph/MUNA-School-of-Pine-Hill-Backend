@@ -11,8 +11,6 @@ import com.bezkoder.spring.jpa.postgresql.dto.auth.LoginRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.PasswordResetConfirmRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.PasswordResetRequest;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.SetPasswordRequest;
-import com.bezkoder.spring.jpa.postgresql.dto.auth.SignupRequest;
-import com.bezkoder.spring.jpa.postgresql.dto.auth.StaffSignupRequest;
 import com.bezkoder.spring.jpa.postgresql.service.AuthService;
 import com.bezkoder.spring.jpa.postgresql.service.StaffService;
 
@@ -33,19 +31,6 @@ public class AuthController {
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
 		return ResponseEntity.ok(authService.login(request));
-	}
-
-	@PostMapping("/signup")
-	public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest request) {
-		return ResponseEntity.ok(authService.signup(request));
-	}
-
-	@PostMapping("/staff-signup")
-	public ResponseEntity<AuthResponse> staffSignup(@Valid @RequestBody StaffSignupRequest request) {
-		staffService.submitStaffSignup(request);
-		AuthResponse response = new AuthResponse(true,
-				"Your request has been submitted. You will receive an email when it is approved.");
-		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/set-password")

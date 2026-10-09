@@ -9,11 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bezkoder.spring.jpa.postgresql.dto.auth.AuthResponse;
 import com.bezkoder.spring.jpa.postgresql.dto.auth.LoginRequest;
-import com.bezkoder.spring.jpa.postgresql.dto.auth.SignupRequest;
 import com.bezkoder.spring.jpa.postgresql.entity.AdminUser;
 import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminAccountStatus;
 import com.bezkoder.spring.jpa.postgresql.entity.enums.AdminApprovalStatus;
-import com.bezkoder.spring.jpa.postgresql.exception.BadRequestException;
 import com.bezkoder.spring.jpa.postgresql.exception.UnauthorizedException;
 import com.bezkoder.spring.jpa.postgresql.repository.AdminUserRepository;
 import com.bezkoder.spring.jpa.postgresql.security.LoginRateLimiter;
@@ -99,14 +97,6 @@ public class AuthServiceImpl implements AuthService {
 		response.setRoles(roles);
 		authAuditService.log("LOGIN_SUCCESS", "admin_user", admin.getId().toString(), identifier, "Admin login");
 		return response;
-	}
-
-	@Override
-	public AuthResponse signup(SignupRequest request) {
-		if (!request.getPassword().equals(request.getConfirmPassword())) {
-			throw new BadRequestException("Passwords do not match.");
-		}
-		throw new BadRequestException("Use the staff signup page to request access.");
 	}
 
 	private void registerFailedAttempt(AdminUser admin) {
